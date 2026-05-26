@@ -3,102 +3,179 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FF Panel v7</title>
-<link rel="manifest" href="/manifest.json">
+<title>FF Registry Panel v2</title>
 <meta name="theme-color" content="#0a0a0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;user-select:none}
-body{background:#0a0a0f;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;overscroll-behavior:none}
-.panel{background:linear-gradient(145deg,#12121a,#1a1a2e);border-radius:24px;padding:20px;width:360px;max-width:94vw;box-shadow:0 20px 60px rgba(255,0,80,.25);border:1px solid rgba(255,0,80,.15);position:relative;max-height:90vh;overflow-y:auto}
-.header{text-align:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06)}
-.header h1{font-size:20px;font-weight:800;background:linear-gradient(90deg,#ff0060,#ff4d6d);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.header span{font-size:10px;color:#666;letter-spacing:2px}
-.section{margin-bottom:12px}
-.section-title{font-size:11px;font-weight:700;color:#777;margin-bottom:6px;padding-left:4px;letter-spacing:1px;text-transform:uppercase}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.feature{background:rgba(255,255,255,.04);border-radius:10px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:.15s}
-.feature:active{transform:scale(.95);background:rgba(255,255,255,.08)}
-.feature .label{font-size:12px;font-weight:600;color:#ccc;display:flex;align-items:center;gap:6px}
-.feature .label .badge{font-size:8px;background:rgba(255,0,80,.2);color:#ff4d6d;padding:1px 5px;border-radius:3px;font-weight:700}
-.toggle{width:40px;height:20px;background:#2a2a2a;border-radius:10px;position:relative;transition:.2s;flex-shrink:0;border:1px solid rgba(255,255,255,.05)}
-.toggle.active{background:#ff0060;border-color:#ff0060}
-.toggle::after{content:'';position:absolute;top:1px;left:1px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.4)}
-.toggle.active::after{left:21px}
-.full{grid-column:1/-1}
-.btn-inject{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#ff0060,#ff4d6d);color:#fff;font-size:15px;font-weight:800;letter-spacing:1px;cursor:pointer;margin-top:10px;transition:.15s;text-transform:uppercase;box-shadow:0 6px 20px rgba(255,0,80,.3)}
-.btn-inject:active{transform:scale(.97)}
-.btn-inject.injected{background:linear-gradient(135deg,#00c853,#00e676);box-shadow:0 6px 20px rgba(0,200,80,.3)}
-.footer{text-align:center;margin-top:8px;font-size:9px;color:#333;padding-top:6px;border-top:1px solid rgba(255,255,255,.03)}
-.floating-icon{position:fixed;bottom:80px;right:20px;width:52px;height:52px;background:linear-gradient(135deg,#ff0060,#ff4d6d);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 6px 24px rgba(255,0,80,.5);z-index:9999;cursor:pointer;transition:.15s;border:2px solid rgba(255,255,255,.1);display:none;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
-.floating-icon:active{transform:scale(.85)}
+body{background:#0a0a0f;overflow:hidden;height:100vh}
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px}
+.overlay h2{color:#ff0060;font-size:20px;margin-bottom:8px}
+.overlay p{color:#aaa;font-size:13px;margin-bottom:20px;max-width:300px}
+.overlay button{background:#ff0060;border:none;color:#fff;padding:14px 36px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;width:80%;max-width:280px}
+.overlay button:active{transform:scale(.96)}
+.overlay .skip{color:#555;margin-top:14px;font-size:12px;cursor:pointer;text-decoration:underline}
+.panel{background:linear-gradient(145deg,#12121a,#1a1a2e);border-radius:20px;padding:16px;width:340px;max-width:92vw;margin:20px auto;box-shadow:0 20px 60px rgba(255,0,80,.2);border:1px solid rgba(255,0,80,.12);max-height:88vh;overflow-y:auto}
+.header{text-align:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.header h1{font-size:18px;font-weight:800;background:linear-gradient(90deg,#ff0060,#ff4d6d);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header span{font-size:9px;color:#555;letter-spacing:1px}
+.section-title{font-size:10px;font-weight:700;color:#666;margin:8px 0 5px 4px;letter-spacing:1px;text-transform:uppercase}
+.feat{background:rgba(255,255,255,.03);border-radius:8px;padding:7px 10px;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(255,255,255,.04);cursor:pointer;margin-bottom:4px}
+.feat:active{background:rgba(255,255,255,.07)}
+.feat .lbl{font-size:12px;font-weight:600;color:#bbb;display:flex;align-items:center;gap:5px}
+.feat .lbl .tag{font-size:7px;background:rgba(255,0,80,.15);color:#ff4d6d;padding:1px 4px;border-radius:2px}
+.tog{width:36px;height:18px;background:#2a2a2a;border-radius:9px;position:relative;transition:.2s;flex-shrink:0;border:1px solid rgba(255,255,255,.04)}
+.tog.on{background:#ff0060;border-color:#ff0060}
+.tog::after{content:'';position:absolute;top:1px;left:1px;width:14px;height:14px;background:#fff;border-radius:50%;transition:.2s}
+.tog.on::after{left:19px}
+.code-box{background:#0d0d14;border-radius:8px;padding:10px;margin:10px 0;border:1px solid #222;font-family:'Courier New',monospace;font-size:9px;color:#0f0;overflow-x:auto;white-space:pre;line-height:1.5;max-height:140px;overflow-y:auto}
+.btn-inj{width:100%;padding:11px;border:none;border-radius:8px;background:linear-gradient(135deg,#ff0060,#ff4d6d);color:#fff;font-size:14px;font-weight:800;cursor:pointer;margin-top:8px;text-transform:uppercase;box-shadow:0 4px 16px rgba(255,0,80,.25)}
+.btn-inj:active{transform:scale(.97)}
+.btn-inj.done{background:linear-gradient(135deg,#00c853,#00e676)}
+.floating{position:fixed;bottom:70px;right:16px;width:48px;height:48px;background:linear-gradient(135deg,#ff0060,#ff4d6d);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;box-shadow:0 4px 20px rgba(255,0,80,.5);z-index:9999;cursor:pointer;display:none;border:2px solid rgba(255,255,255,.08)}
+.floating:active{transform:scale(.85)}
+.foot{text-align:center;margin-top:6px;font-size:8px;color:#333}
 </style>
 </head>
 <body>
 
-<div class="floating-icon" id="floatingIcon" onclick="togglePanel()">⚡</div>
+<!-- Overlay Permission -->
+<div class="overlay" id="permScreen">
+    <h2>⚡ Display Overlay Permission</h2>
+    <p>This panel needs permission to show the floating control icon above Free Fire during gameplay.</p>
+    <button onclick="requestPerm()">✅ Grant Overlay Permission</button>
+    <span class="skip" onclick="skipPerm()">Skip — I'll do it manually</span>
+</div>
 
+<!-- Floating Icon -->
+<div class="floating" id="floatIcon" onclick="togglePanel()">⚡</div>
+
+<!-- Main Panel -->
 <div class="panel" id="mainPanel">
 <div class="header">
-    <h1>⚡ ULTIMATE PANEL</h1>
-    <span>com.dts.freefireth • v7.1</span>
+    <h1>⚡ REGISTRY PANEL</h1>
+    <span>com.dts.freefireth • NO ROOT</span>
 </div>
 
-<div class="section">
-    <div class="section-title">🎯 AIMBOT</div>
-    <div class="grid">
-        <div class="feature" onclick="tog(this)"><span class="label">🎯 100% Headshot <span class="badge">ULTRA</span></span><div class="toggle active"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">🔒 Aim Lock</span><div class="toggle active"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">🔄 Drag Shot</span><div class="toggle active"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">🤫 Silent Aim</span><div class="toggle active"></div></div>
-    </div>
-</div>
+<div class="section-title">🎯 AIM</div>
+<div class="feat" onclick="tog(this,'CrosshairLockingOnEnemy')"><span class="lbl">100% Headshot <span class="tag">ULTRA</span></span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'AimLockOnHead')"><span class="lbl">🔒 Aim Lock</span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'DragToHeadShot')"><span class="lbl">🔄 Drag Shot</span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'SilentAimMode')"><span class="lbl">🤫 Silent Aim</span><div class="tog on"></div></div>
 
-<div class="section">
-    <div class="section-title">👁️ VISUAL / ESP</div>
-    <div class="grid">
-        <div class="feature" onclick="tog(this)"><span class="label">📏 ESP Lines <span class="badge">NEW</span></span><div class="toggle active"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">🧱 Wall Hack</span><div class="toggle active"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">📦 Box ESP</span><div class="toggle active"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">✨ Glow</span><div class="toggle active"></div></div>
-        <div class="feature full" onclick="tog(this)"><span class="label">🎯 Enemy Tracker <span class="badge">360°</span></span><div class="toggle active"></div></div>
-    </div>
-</div>
+<div class="section-title">👁️ ESP / VISUAL</div>
+<div class="feat" onclick="tog(this,'ESPLinesToEnemy')"><span class="lbl">📏 ESP Lines</span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'WallHackMode')"><span class="lbl">🧱 Wall Hack</span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'BoxESPOnEnemy')"><span class="lbl">📦 Box ESP</span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'GlowEnemyBody')"><span class="lbl">✨ Glow</span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'EnemyTracker360')"><span class="lbl">🎯 Enemy Tracker</span><div class="tog on"></div></div>
 
-<div class="section">
-    <div class="section-title">🔫 WEAPON</div>
-    <div class="grid">
-        <div class="feature" onclick="tog(this)"><span class="label">📉 No Recoil</span><div class="toggle active"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">⚡ Fast ADS</span><div class="toggle active"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">🔥 Auto Fire</span><div class="toggle active"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">🔄 Wall Reverse <span class="badge">BRUTAL</span></span><div class="toggle active"></div></div>
-    </div>
-</div>
+<div class="section-title">🔫 WEAPON</div>
+<div class="feat" onclick="tog(this,'ZeroRecoilMode')"><span class="lbl">📉 No Recoil</span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'FastADSpeed')"><span class="lbl">⚡ Fast ADS</span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'AutoFireOnEnemy')"><span class="lbl">🔥 Auto Fire</span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'WallReverseBullet')"><span class="lbl">🔄 Wall Reverse</span><div class="tog on"></div></div>
 
-<div class="section">
-    <div class="section-title">⚙️ MISC</div>
-    <div class="grid">
-        <div class="feature" onclick="tog(this)"><span class="label">🛡️ Anti Ban</span><div class="toggle active"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">💨 Speed Hack</span><div class="toggle"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">⬆️ High Jump</span><div class="toggle"></div></div>
-        <div class="feature" onclick="tog(this)"><span class="label">🧱 Wall Shoot</span><div class="toggle active"></div></div>
-    </div>
-</div>
+<div class="section-title">⚙️ MISC</div>
+<div class="feat" onclick="tog(this,'AntiBanProtection')"><span class="lbl">🛡️ Anti Ban</span><div class="tog on"></div></div>
+<div class="feat" onclick="tog(this,'SpeedHackBoost')"><span class="lbl">💨 Speed Hack</span><div class="tog"></div></div>
+<div class="feat" onclick="tog(this,'HighJumpMode')"><span class="lbl">⬆️ High Jump</span><div class="tog"></div></div>
+<div class="feat" onclick="tog(this,'WallShootThrough')"><span class="lbl">🧱 Wall Shoot</span><div class="tog on"></div></div>
 
-<button class="btn-inject" id="injectBtn" onclick="injectNow()">⚡ INJECT & LAUNCH FF</button>
-<div class="footer">Authorized Pentest • com.dts.freefireth</div>
+<!-- Registry Code Preview -->
+<div class="section-title">📄 REGISTRY CONFIG (Auto-Generated)</div>
+<div class="code-box" id="registryOutput">Generating registry...</div>
+
+<button class="btn-inj" id="injBtn" onclick="injectNow()">⚡ INJECT & LAUNCH FF</button>
+<div class="foot">Authorized Pentest • com.dts.freefireth</div>
 </div>
 
 <script>
-function tog(el) {
-    const t = el.querySelector('.toggle');
-    if(t) t.classList.toggle('active');
+let features = {};
+
+function tog(el, key) {
+    const t = el.querySelector('.tog');
+    if(t) {
+        t.classList.toggle('on');
+        features[key] = t.classList.contains('on') ? 1 : 0;
+        updateRegistry();
+    }
+}
+
+function updateRegistry() {
+    const keys = {
+        CrosshairLockingOnEnemy: 1,
+        AimLockOnHead: 1,
+        DragToHeadShot: 1,
+        SilentAimMode: 1,
+        ESPLinesToEnemy: 1,
+        WallHackMode: 1,
+        BoxESPOnEnemy: 1,
+        GlowEnemyBody: 1,
+        EnemyTracker360: 1,
+        ZeroRecoilMode: 1,
+        FastADSpeed: 1,
+        AutoFireOnEnemy: 1,
+        WallReverseBullet: 1,
+        AntiBanProtection: 1,
+        SpeedHackBoost: 0,
+        HighJumpMode: 0,
+        WallShootThrough: 1
+    };
+    
+    // Override with current toggle states
+    Object.keys(features).forEach(k => {
+        keys[k] = features[k];
+    });
+    
+    let reg = 'Windows Registry Editor Version 5.00\n\n';
+    reg += '[HKEY_CURRENT_USER\\Software\\FreeFire]\n';
+    Object.keys(keys).forEach(k => {
+        reg += `"${k}"=dword:0000000${keys[k]}\n`;
+    });
+    reg += '\n[HKEY_CURRENT_USER\\Software\\FreeFire\\Aimbot]\n';
+    reg += '"HeadshotRate"=dword:000003E8\n';
+    reg += '"DragSpeed"=dword:0000000A\n';
+    reg += '"FOVRange"=dword:000001F4\n\n';
+    reg += '[HKEY_CURRENT_USER\\Software\\FreeFire\\ESP]\n';
+    reg += '"LineThickness"=dword:00000002\n';
+    reg += '"GlowIntensity"=dword:000000FF\n';
+    reg += '"WallhackDepth"=dword:00000064\n\n';
+    reg += '[HKEY_CURRENT_USER\\Software\\FreeFire\\AntiCheat]\n';
+    reg += '"BypassMode"=dword:00000001\n';
+    reg += '"SpoofInputs"=dword:00000001\n';
+    
+    document.getElementById('registryOutput').textContent = reg;
+}
+
+function requestPerm() {
+    try {
+        window.location.href = 'intent:#Intent;action=android.settings.action.MANAGE_OVERLAY_PERMISSION;end';
+    } catch(e) {}
+    document.getElementById('permScreen').innerHTML = `
+        <h2>✅ Permission Requested</h2>
+        <p>Go to: <b>Settings → Apps → [Your Browser] → Display Over Other Apps → Allow</b></p>
+        <p>Then tap <b>Start Panel</b></p>
+        <button onclick="skipPerm()">🚀 Start Panel</button>
+    `;
+}
+
+function skipPerm() {
+    document.getElementById('permScreen').style.display = 'none';
+    document.getElementById('mainPanel').style.display = 'block';
+    updateRegistry();
+    
+    // Init features from DOM
+    document.querySelectorAll('.feat').forEach(el => {
+        const key = el.getAttribute('onclick').match(/'([^']+)'/)[1];
+        const t = el.querySelector('.tog');
+        features[key] = t.classList.contains('on') ? 1 : 0;
+    });
 }
 
 function togglePanel() {
     const p = document.getElementById('mainPanel');
-    const i = document.getElementById('floatingIcon');
+    const i = document.getElementById('floatIcon');
     if(p.style.display === 'none' || p.style.display === '') {
         p.style.display = 'block';
         i.style.display = 'none';
@@ -109,20 +186,21 @@ function togglePanel() {
 }
 
 function injectNow() {
-    const btn = document.getElementById('injectBtn');
-    btn.classList.add('injected');
+    const btn = document.getElementById('injBtn');
+    btn.classList.add('done');
     btn.textContent = '✅ INJECTED — ACTIVE';
-    document.getElementById('floatingIcon').style.display = 'flex';
+    document.getElementById('floatIcon').style.display = 'flex';
     document.getElementById('mainPanel').style.display = 'none';
     btn.disabled = true;
-    btn.style.opacity = '0.6';
-
+    
     // Try to launch FF
     setTimeout(() => {
         window.location.href = 'intent://com.dts.freefireth#Intent;scheme=package;end';
-    }, 800);
+    }, 500);
 }
-</script>
 
+// Init
+document.getElementById('mainPanel').style.display = 'none';
+</script>
 </body>
 </html>
