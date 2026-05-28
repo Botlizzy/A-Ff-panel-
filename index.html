@@ -1,568 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>URL Unshortener — Bypass Short Links & Ad Redirects</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0a0a0f;
-      color: #e0e0e0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-    }
-    .container {
-      max-width: 800px;
-      width: 100%;
-      padding: 3rem 1.5rem;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.4rem;
-      color: #fff;
-    }
-    .subtitle {
-      color: #888;
-      margin-bottom: 2rem;
-      font-size: 0.95rem;
-    }
-    .input-group {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-    input {
-      flex: 1;
-      padding: 0.85rem 1rem;
-      border: 1px solid #333;
-      border-radius: 8px;
-      background: #14141b;
-      color: #fff;
-      font-size: 1rem;
-      outline: none;
-    }
-    input:focus {
-      border-color: #5b7cfa;
-    }
-    input::placeholder {
-      color: #555;
-    }
-    button {
-      padding: 0.85rem 1.5rem;
-      background: #5b7cfa;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      font-weight: 600;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-    button:hover:not(:disabled) {
-      background: #4a6ae0;
-    }
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .error {
-      background: #3a1515;
-      border: 1px solid #5a2020;
-      padding: 1rem;
-      border-radius: 8px;
-      color: #ff8080;
-      margin-bottom: 1rem;
-    }
-    .card {
-      background: #14141b;
-      border: 1px solid #2a2a35;
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    .card.final {
-      border-color: #2a5a3a;
-      background: #0f1f15;
-    }
-    .label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      color: #888;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.5rem;
-    }
-    .url-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      word-break: break-all;
-    }
-    .url-row a {
-      color: #5b7cfa;
-      text-decoration: none;
-      font-size: 1.1rem;
-    }
-    .url-row a:hover {
-      text-decoration: underline;
-    }
-    .copy-btn {
-      background: none;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 0.3rem 0.5rem;
-      cursor: pointer;
-      font-size: 1rem;
-      flex-shrink: 0;
-      color: #aaa;
-    }
-    .copy-btn:hover {
-      background: #222;
-      color: #fff;
-    }
-    .meta {
-      margin-top: 1rem;
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .badge {
-      padding: 0.25rem 0.7rem;
-      border-radius: 100px;
-      font-size: 0.8rem;
-      background: #2a2a35;
-      color: #aaa;
-    }
-    .badge.warn {
-      background: #3a2f00;
-      color: #ffcc00;
-    }
-    .badge.info {
-      background: #002a3a;
-      color: #66ccff;
-    }
-    .chain h3 {
-      color: #aaa;
-      font-size: 1rem;
-      margin-bottom: 0.75rem;
-    }
-    .hop {
-      display: flex;
-      gap: 0.75rem;
-      padding: 0.75rem;
-      background: #14141b;
-      border: 1px solid #2a2a35;
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
-      align-items: flex-start;
-    }
-    .hop-num {
-      color: #555;
-      font-size: 0.85rem;
-      min-width: 2rem;
-      font-weight: 600;
-    }
-    .hop-details {
-      flex: 1;
-      min-width: 0;
-      word-break: break-all;
-    }
-    .hop-status {
-      display: inline-block;
-      padding: 0.15rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-    .status-2 {
-      background: #0a2a10;
-      color: #66ff88;
-    }
-    .status-3 {
-      background: #1a2a3a;
-      color: #66aaff;
-    }
-    .status-4 {
-      background: #3a2a00;
-      color: #ffaa00;
-    }
-    .status-5 {
-      background: #3a1515;
-      color: #ff6666;
-    }
-    .hop-url {
-      font-size: 0.85rem;
-      color: #aaa;
-      margin-bottom: 0.2rem;
-    }
-    .hop-arrow {
-      font-size: 0.85rem;
-      color: #5b7cfa;
-    }
-    .hop-type {
-      display: inline-block;
-      font-size: 0.7rem;
-      padding: 0.1rem 0.4rem;
-      background: #2a2a35;
-      border-radius: 4px;
-      color: #888;
-      margin-top: 0.25rem;
-    }
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      margin-right: 0.5rem;
-      vertical-align: middle;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .footer {
-      margin-top: 2rem;
-      text-align: center;
-      color: #444;
-      font-size: 0.8rem;
-    }
-    .footer a {
-      color: #5b7cfa;
-      text-decoration: none;
-    }
-    @media (max-width: 600px) {
-      .input-group {
-        flex-direction: column;
-      }
-      .container {
-        padding: 1.5rem 1rem;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URL Unshortener — Bypass Short Links</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0f;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center}
+.container{max-width:800px;width:100%;padding:3rem 1.5rem}
+h1{font-size:2rem;margin-bottom:0.4rem;color:#fff}
+.subtitle{color:#888;margin-bottom:2rem}
+.input-group{display:flex;gap:.5rem;margin-bottom:1.5rem}
+input{flex:1;padding:.85rem 1rem;border:1px solid #333;border-radius:8px;background:#14141b;color:#fff;font-size:1rem;outline:none}
+input:focus{border-color:#5b7cfa}
+input::placeholder{color:#555}
+button{padding:.85rem 1.5rem;background:#5b7cfa;color:#fff;border:none;border-radius:8px;font-size:1rem;cursor:pointer;font-weight:600;white-space:nowrap;transition:background .2s}
+button:hover:not(:disabled){background:#4a6ae0}
+button:disabled{opacity:.5;cursor:not-allowed}
+.error{background:#3a1515;border:1px solid #5a2020;padding:1rem;border-radius:8px;color:#ff8080;margin-bottom:1rem}
+.card{background:#14141b;border:1px solid #2a2a35;border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.card.final{border-color:#2a5a3a;background:#0f1f15}
+.label{font-size:.8rem;text-transform:uppercase;color:#888;letter-spacing:.05em;margin-bottom:.5rem}
+.url-row{display:flex;align-items:center;gap:.5rem;word-break:break-all}
+.url-row a{color:#5b7cfa;text-decoration:none;font-size:1.1rem}
+.url-row a:hover{text-decoration:underline}
+.copy-btn{background:none;border:1px solid #333;border-radius:6px;padding:.3rem .5rem;cursor:pointer;font-size:1rem;flex-shrink:0;color:#aaa}
+.copy-btn:hover{background:#222;color:#fff}
+.meta{margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap}
+.badge{padding:.25rem .7rem;border-radius:100px;font-size:.8rem;background:#2a2a35;color:#aaa}
+.badge.warn{background:#3a2f00;color:#ffcc00}
+.badge.info{background:#002a3a;color:#66ccff}
+.chain h3{color:#aaa;font-size:1rem;margin-bottom:.75rem}
+.hop{display:flex;gap:.75rem;padding:.75rem;background:#14141b;border:1px solid #2a2a35;border-radius:8px;margin-bottom:.5rem;align-items:flex-start}
+.hop-num{color:#555;font-size:.85rem;min-width:2rem;font-weight:600}
+.hop-details{flex:1;min-width:0;word-break:break-all}
+.hop-status{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.8rem;font-weight:600;margin-bottom:.25rem}
+.s2{background:#0a2a10;color:#66ff88}
+.s3{background:#1a2a3a;color:#66aaff}
+.s4{background:#3a2a00;color:#ffaa00}
+.s5{background:#3a1515;color:#ff6666}
+.hop-url{font-size:.85rem;color:#aaa;margin-bottom:.2rem}
+.hop-arrow{font-size:.85rem;color:#5b7cfa}
+.hop-type{display:inline-block;font-size:.7rem;padding:.1rem .4rem;background:#2a2a35;border-radius:4px;color:#888;margin-top:.25rem}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin-right:.5rem;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.footer{margin-top:2rem;text-align:center;color:#444;font-size:.8rem}
+@media(max-width:600px){.input-group{flex-direction:column}.container{padding:1.5rem 1rem}}
+</style>
 </head>
 <body>
-<div class="container" id="app">
-  <h1>🔗 URL Unshortener</h1>
-  <p class="subtitle">Follow redirect chains, bypass shorteners &amp; ad links — find the real destination.</p>
-
-  <div class="input-group">
-    <input type="text" id="urlInput" placeholder="Paste a shortened URL (bit.ly, t.co, adf.ly, sh.st, etc.)" />
-    <button id="goBtn" onclick="unshorten()">Unshorten</button>
-  </div>
-
-  <div id="error" class="error" style="display:none"></div>
-  <div id="loading" style="display:none; text-align:center; padding:2rem; color:#888;">
-    <span class="spinner"></span> Tracing redirect chain...
-  </div>
-  <div id="results"></div>
-
-  <div class="footer">
-    Works on: bit.ly, t.co, tinyurl.com, adf.ly, sh.st, cutt.ly, rebrand.ly, and most shorteners.
-  </div>
+<div class="container">
+<h1>🔗 URL Unshortener</h1>
+<p class="subtitle">Follow redirect chains, bypass shorteners &amp; ad links — find the real destination.</p>
+<div class="input-group">
+<input type="text" id="urlInput" placeholder="Paste a short URL (bit.ly, t.co, adf.ly, earnlinks.in, arolinks.com, etc.)">
+<button id="goBtn" onclick="go()">Unshorten</button>
+</div>
+<div id="error" class="error" style="display:none"></div>
+<div id="loading" style="display:none;text-align:center;padding:2rem;color:#888"><span class="spinner"></span> Tracing redirect chain...</div>
+<div id="results"></div>
+<div class="footer">Works on: bit.ly, t.co, tinyurl, earnlinks.in, arolinks.com, adf.ly, cutt.ly, sh.st, and most shorteners.</div>
 </div>
 
 <script>
-// List of free CORS proxies — rotates through them if one fails
+// --- CONFIG ---
 const PROXIES = [
-  { url: 'https://api.allorigins.win/raw?url=', type: 'get' },
-  { url: 'https://corsproxy.io/?', type: 'get' },
-  { url: 'https://api.codetabs.com/v1/proxy?quest=', type: 'get' },
+  'https://corsproxy.io/?url=',
+  'https://api.allorigins.win/raw?url=',
+  'https://api.codetabs.com/v1/proxy?quest=',
 ];
-
 const MAX_HOPS = 30;
-const TIMEOUT_MS = 15000;
-const AD_DOMAINS = [
-  'adfoc.us', 'adf.ly', 'shorte.st', 'bc.vc', 'linkbucks.com',
-  'cash4links.co', 'ceesty.com', 'clk.sh', 'clk.im', 'corneey.com',
-  'destyy.com', 'festyy.com', 'getyarn.io',
-  'horts.com', 'ning.so', 'onx.me', 'paywithapost.de',
-  'po.st', 'q.gs', 'sh.st', 'viid.me',
-  'x.co', 'zil.im', 't.co', 'bit.ly', 'tinyurl.com',
-  'goo.gl', 'ow.ly', 'is.gd', 'buff.ly', 'tiny.cc', 'tr.im',
-  'shorturl.at', 'cutt.ly', 'rebrand.ly', 'tiny.one', 'tny.im',
-  'urlz.fr', 's.id', 'rb.gy', 'v.gd',
-  'vl.xyz', 'adbull.me', 'lnkd.in',
-  'amzn.to', 'zpr.io', 'wp.me', 'flic.kr', 'mzl.la',
-  'youtu.be', 'fb.com', 'fb.me', 'on.fb.me',
-  'l.facebook.com', 'lm.facebook.com',
-  'safelinkconverter.com', 'shortlink.shop',
+
+const SHORTENER_DOMAINS = [
+  'earnlinks.in','arolinks.com','adf.ly','adfoc.us','shorte.st','bc.vc',
+  'linkbucks.com','cash4links.co','ceesty.com','clk.sh','clk.im','corneey.com',
+  'destyy.com','festyy.com','horts.com','ning.so','onx.me','po.st','q.gs',
+  'sh.st','viid.me','x.co','zil.im','t.co','bit.ly','tinyurl.com','goo.gl',
+  'ow.ly','is.gd','buff.ly','tiny.cc','tr.im','shorturl.at','cutt.ly',
+  'rebrand.ly','tiny.one','tny.im','urlz.fr','s.id','rb.gy','v.gd',
+  'lnkd.in','amzn.to','zpr.io','wp.me','flic.kr','mzl.la','youtu.be',
+  'fb.com','fb.me','on.fb.me','safelinkconverter.com','vl.xyz','adbull.me',
+  'shortlink.shop','earnlink.io','earnlink.in','arolink.com',
+  'thebloggerspoint.in','vip-link.net','m.vip-link.net','gpfaucet.com',
+  'url.adsquite.com','gpl-market.com','linksgo.in','link.wrbloggers.com',
+  'e2share.in','earningtime.in','shrinkforearn.in',
+  'shorturl.shop','bitly.com',
 ];
 
-function isAdDomain(hostname) {
-  if (!hostname) return false;
-  const h = hostname.toLowerCase();
-  return AD_DOMAINS.some(ad => h === ad || h.endsWith('.' + ad));
+function isShortener(h) {
+  if (!h) return false;
+  h = h.toLowerCase().replace(/^www\./,'');
+  return SHORTENER_DOMAINS.some(d => h === d || h.endsWith('.'+d));
 }
 
-function showError(msg) {
-  const el = document.getElementById('error');
-  el.textContent = msg;
-  el.style.display = 'block';
-  setTimeout(() => { el.style.display = 'none'; }, 8000);
+function err(msg) {
+  const e = document.getElementById('error');
+  e.textContent = msg; e.style.display = 'block';
+  setTimeout(()=>e.style.display='none',8000);
 }
 
-function setLoading(v) {
-  document.getElementById('loading').style.display = v ? 'block' : 'none';
+function load(v) {
+  document.getElementById('loading').style.display = v?'block':'none';
   document.getElementById('goBtn').disabled = v;
 }
 
-async function fetchViaProxy(url, proxyIndex = 0) {
-  if (proxyIndex >= PROXIES.length) {
-    throw new Error('All proxies exhausted');
-  }
-
-  const proxy = PROXIES[proxyIndex];
-  const proxyUrl = proxy.url + encodeURIComponent(url);
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
+async function fetchViaProxy(url, idx=0) {
+  if (idx >= PROXIES.length) throw new Error('Proxy exhausted');
+  const c = new AbortController();
+  const t = setTimeout(()=>c.abort(),15000);
   try {
-    const resp = await fetch(proxyUrl, {
-      signal: controller.signal,
-      headers: { 'Accept': 'text/html,application/xhtml+xml,application/xml,*/*' }
-    });
-    clearTimeout(timeout);
-
-    if (!resp.ok) {
-      // Try next proxy
-      return fetchViaProxy(url, proxyIndex + 1);
-    }
-
-    const text = await resp.text();
-
-    // Get the effective final URL from the proxy response
-    // allorigins puts original URL in responseURL; corsproxy doesn't.
-    // We'll parse the Location header from the text if it's a redirect,
-    // otherwise this is the final page content.
-    return {
-      body: text,
-      finalUrl: resp.url || url,
-      proxyIndex,
-    };
-  } catch (err) {
-    clearTimeout(timeout);
-    // Try next proxy
-    return fetchViaProxy(url, proxyIndex + 1);
+    const r = await fetch(PROXIES[idx] + encodeURIComponent(url), {signal:c.signal});
+    clearTimeout(t);
+    const text = await r.text();
+    // allorigins wraps response in JSON sometimes
+    try {
+      const j = JSON.parse(text);
+      if (j && j.contents) return {body: j.contents, url: j.status?.url || url};
+      if (j && j.body) return {body: typeof j.body === 'string' ? j.body : JSON.stringify(j.body), url: url};
+    } catch {}
+    return {body: text, url: r.url || url};
+  } catch(e) {
+    clearTimeout(t);
+    return fetchViaProxy(url, idx+1);
   }
 }
 
-function extractRedirect(body, currentUrl) {
-  // 1. Check meta refresh
-  const metaMatch = body.match(
-    /<meta[^>]*http-equiv=["']refresh["'][^>]*content=["']\d*;?\s*url=["']?([^"'>\s]+)["']?[^>]*\/?>/i
-  );
-  if (metaMatch) {
-    try {
-      return new URL(metaMatch[1], currentUrl).href;
-    } catch {}
-  }
-
-  // 2. Check JavaScript redirects
-  const jsPatterns = [
-    /window\.location\s*=\s*["']([^"']+)["']/,
-    /window\.location\.href\s*=\s*["']([^"']+)["']/,
-    /window\.location\.replace\s*\(\s*["']([^"']+)["']/,
-    /window\.location\.assign\s*\(\s*["']([^"']+)["']/,
-    /top\.location\s*=\s*["']([^"']+)["']/,
-    /document\.location\.href\s*=\s*["']([^"']+)["']/,
-    /location\.href\s*=\s*["']([^"']+)["']/,
-    /location\.replace\s*\(\s*["']([^"']+)["']/,
-  ];
-
-  for (const pattern of jsPatterns) {
-    const match = body.match(pattern);
-    if (match) {
-      try {
-        return new URL(match[1], currentUrl).href;
-      } catch {}
-    }
-  }
-
-  // 3. Check if the body itself is a redirect via server response (we already handled this via proxy)
-  //    Some proxies return the Location in the body for 3xx responses
-  const locationMatch = body.match(/^https?:\/\/[^\s<>"']+/m);
-  if (locationMatch) {
-    try {
-      new URL(locationMatch[0]);
-      // Only use this if it looks like a plain URL and not the original content
-      if (body.trim().startsWith('http') && body.trim().length < 500) {
-        return locationMatch[0];
-      }
-    } catch {}
-  }
-
-  return null;
-}
-
-async function unshorten() {
+async function go() {
   const input = document.getElementById('urlInput').value.trim();
   if (!input) return;
-
   let targetUrl;
   try {
-    targetUrl = input.startsWith('http') ? input : 'https://' + input;
+    targetUrl = input.startsWith('http') ? input : 'https://'+input;
     new URL(targetUrl);
-  } catch {
-    showError('Please enter a valid URL.');
-    return;
-  }
+  } catch { err('Invalid URL'); return; }
 
   document.getElementById('results').innerHTML = '';
-  setLoading(true);
-
-  const chain = [];
-  let currentUrl = targetUrl;
-  let finalUrl = targetUrl;
-  let stopped = null;
-  const visited = new Set();
-
+  load(true);
+  let cur = targetUrl, chain = [], visited = new Set(), stopped = null;
   try {
-    for (let hop = 0; hop < MAX_HOPS; hop++) {
-      if (visited.has(currentUrl)) {
-        stopped = 'loop_detected';
-        break;
+    for (let i=0; i<MAX_HOPS; i++) {
+      if (visited.has(cur)) { stopped = 'loop'; break; }
+      visited.add(cur);
+      const {body, url: eff} = await fetchViaProxy(cur);
+      const entry = {url: cur, status: 200};
+      
+      // Check meta refresh
+      const m = body.match(/<meta[^>]*http-equiv=["']refresh["'][^>]*content=["']\d*;?\s*url=["']?([^"'>\s]+)["']?[^>]*\/?>/i);
+      if (m) { try {
+        const next = new URL(m[1], cur).href;
+        entry.redirectTo = next; entry.type = 'meta_refresh'; chain.push(entry);
+        cur = next; continue;
+      } catch {} }
+
+      // Check JS redirects
+      const jsPats = [
+        /window\.location\s*=\s*["']([^"']+)["']/,
+        /window\.location\.href\s*=\s*["']([^"']+)["']/,
+        /window\.location\.replace\s*\(\s*["']([^"']+)["']/,
+        /location\.href\s*=\s*["']([^"']+)["']/,
+        /location\.replace\s*\(\s*["']([^"']+)["']/,
+        /top\.location\s*=\s*["']([^"']+)["']/,
+        /document\.location\.href\s*=\s*["']([^"']+)["']/,
+        /setTimeout\s*\([^)]*["']([^"']+https?:\/\/[^"']+)["']/,
+      ];
+      let found = false;
+      for (const p of jsPats) {
+        const match = body.match(p);
+        if (match) { try {
+          const next = new URL(match[1], cur).href;
+          entry.redirectTo = next; entry.type = 'js_redirect'; chain.push(entry);
+          cur = next; found = true; break;
+        } catch {} }
       }
-      visited.add(currentUrl);
+      if (found) continue;
 
-      const result = await fetchViaProxy(currentUrl);
-      const body = result.body;
-      const effectiveUrl = result.finalUrl;
+      // Check URL params in the current URL for destination
+      try {
+        const p = new URL(cur);
+        for (const name of ['url','link','target','destination','redirect','to','go','next','return','dest','ref','r','u','d','l']) {
+          if (p.searchParams.has(name)) {
+            const v = p.searchParams.get(name);
+            if (v && (v.startsWith('http://')||v.startsWith('https://')||v.startsWith('//'))) {
+              const next = v.startsWith('//') ? 'https:'+v : v;
+              entry.redirectTo = next; entry.type = 'param_'+name; chain.push(entry);
+              cur = next; found = true; break;
+            }
+          }
+        }
+      } catch {}
+      if (found) continue;
 
-      // If the proxy's effective URL differs from what we requested, that's a redirect hop
-      const effectiveHost = new URL(effectiveUrl).hostname;
-      const currentHost = new URL(currentUrl).hostname;
+      // Check for base64 in page
+      const b64 = body.match(/["']([A-Za-z0-9+/=]{50,})["']/);
+      if (b64) { try {
+        const d = atob(b64[1]);
+        if (d.startsWith('http://')||d.startsWith('https://')) {
+          entry.redirectTo = d; entry.type = 'base64'; chain.push(entry);
+          cur = d; continue;
+        }
+      } catch {} }
 
-      if (effectiveUrl !== currentUrl && effectiveHost !== currentHost) {
-        chain.push({ url: currentUrl, status: 301, redirectTo: effectiveUrl, type: 'http_redirect' });
-        currentUrl = effectiveUrl;
-        continue;
+      // Check data attributes
+      const dataPats = [
+        /data-url=["']([^"']+)["']/i,
+        /data-link=["']([^"']+)["']/i,
+        /data-target=["']([^"']+)["']/i,
+        /data-redirect=["']([^"']+)["']/i,
+      ];
+      for (const p of dataPats) {
+        const match = body.match(p);
+        if (match) { try {
+          const next = new URL(match[1], cur).href;
+          if (new URL(next).hostname !== new URL(cur).hostname || isShortener(new URL(next).hostname)) {
+            entry.redirectTo = next; entry.type = 'data_attr'; chain.push(entry);
+            cur = next; found = true; break;
+          }
+        } catch {} }
       }
+      if (found) continue;
 
-      // Check for meta/JS redirect in body
-      const redirectTo = extractRedirect(body, currentUrl);
-      if (redirectTo && redirectTo !== currentUrl) {
-        let redirectType = 'meta_refresh';
-        // Check if it's a JS redirect by re-checking patterns
-        const jsCheck = /window\.location|document\.location|location\.(href|replace|assign)/.test(body);
-        if (jsCheck) redirectType = 'js_redirect';
-        
-        chain.push({ url: currentUrl, status: 200, redirectTo, type: redirectType });
-        currentUrl = redirectTo;
-        continue;
+      // Check "Get Link" / "Continue" buttons
+      const btnPats = [
+        /<a[^>]*href=["']([^"']+)["'][^>]*class=["'][^"']*btn[^"']*["']/i,
+        /<a[^>]*class=["'][^"']*get-link[^"']*["'][^>]*href=["']([^"']+)["']/i,
+        /<a[^>]*id=["']getlink["'][^>]*href=["']([^"']+)["']/i,
+        /<a[^>]*class=["'][^"']*continue[^"']*["'][^>]*href=["']([^"']+)["']/i,
+      ];
+      for (const p of btnPats) {
+        const match = body.match(p);
+        if (match) { try {
+          const next = new URL(match[1], cur).href;
+          entry.redirectTo = next; entry.type = 'extracted_link'; chain.push(entry);
+          cur = next; found = true; break;
+        } catch {} }
       }
+      if (found) continue;
 
-      // No more redirects found
-      finalUrl = currentUrl;
-      chain.push({ url: currentUrl, status: 200, type: 'final' });
-      stopped = null;
-      break;
+      // Final — no more redirects
+      entry.type = 'final'; chain.push(entry);
+      stopped = null; break;
     }
+  } catch(e) { err('Error: '+e.message); load(false); return; }
+  load(false);
 
-    if (chain.length === 0 || chain[chain.length - 1].type !== 'final') {
-      if (!stopped) stopped = 'max_hops_reached';
-      finalUrl = currentUrl;
-    }
+  const finalUrl = chain.length > 0 && chain[chain.length-1].type === 'final' ? chain[chain.length-1].url : cur;
+  const hops = chain.filter(h => h.type !== 'final').length;
+  const fh = new URL(finalUrl).hostname;
+  const ad = isShortener(fh);
 
-  } catch (err) {
-    showError('Error: ' + err.message);
-    setLoading(false);
-    return;
-  }
-
-  setLoading(false);
-  displayResults(targetUrl, finalUrl, chain, stopped);
-}
-
-function displayResults(originalUrl, finalUrl, chain, stopped) {
-  const container = document.getElementById('results');
-  const wasAdBlocked = isAdDomain(new URL(finalUrl).hostname);
-  const hopCount = chain.filter(h => h.type !== 'final').length;
-
-  let html = '';
-
-  // Final destination card
-  html += `<div class="card final">
+  let html = `<div class="card final">
     <div class="label">Final Destination</div>
-    <div class="url-row">
-      <a href="${escapeHtml(finalUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(finalUrl)}</a>
-      <button class="copy-btn" onclick="copyText('${escapeHtml(finalUrl)}')">📋</button>
-    </div>
+    <div class="url-row"><a href="${finalUrl}" target="_blank" rel="noopener">${esc(finalUrl)}</a>
+    <button class="copy-btn" onclick="navigator.clipboard.writeText('${esc(finalUrl)}')">📋</button></div>
     <div class="meta">
-      <span class="badge">${hopCount} ${hopCount === 1 ? 'hop' : 'hops'}</span>
-      ${wasAdBlocked ? '<span class="badge warn">Ad Domain</span>' : ''}
-      ${stopped ? `<span class="badge info">${escapeHtml(stopped)}</span>` : ''}
+      <span class="badge">${hops} ${hops===1?'hop':'hops'}</span>
+      ${ad?'<span class="badge warn">Still Shortener</span>':''}
+      ${stopped?`<span class="badge info">${esc(stopped)}</span>`:''}
     </div>
   </div>`;
 
-  // Original URL card
-  html += `<div class="card">
-    <div class="label">Original URL</div>
-    <div class="url-row">
-      <span style="color:#aaa;font-size:0.9rem">${escapeHtml(originalUrl)}</span>
-    </div>
-  </div>`;
+  html += `<div class="card"><div class="label">Original URL</div><div class="url-row"><span style="color:#aaa;font-size:.9rem">${esc(targetUrl)}</span></div></div>`;
 
-  // Redirect chain
   if (chain.length > 1) {
     html += `<div class="chain"><h3>📡 Redirect Chain (${chain.length} steps)</h3>`;
-    chain.forEach((hop, i) => {
-      const statusClass = hop.status ? `status-${Math.floor(hop.status / 100)}` : '';
-      html += `<div class="hop">
-        <div class="hop-num">#${i + 1}</div>
+    chain.forEach((h,i)=>{
+      const sc = h.status ? 's'+Math.floor(h.status/100) : '';
+      html += `<div class="hop"><div class="hop-num">#${i+1}</div>
         <div class="hop-details">
-          ${hop.status ? `<div class="hop-status ${statusClass}">${hop.status}</div>` : ''}
-          <div class="hop-url">${escapeHtml(hop.url)}</div>
-          ${hop.redirectTo ? `<div class="hop-arrow">→ ${escapeHtml(hop.redirectTo)}</div>` : ''}
-          ${hop.type ? `<div class="hop-type">${escapeHtml(hop.type)}</div>` : ''}
-        </div>
-      </div>`;
+          ${h.status?`<div class="hop-status ${sc}">${h.status}</div>`:''}
+          <div class="hop-url">${esc(h.url)}</div>
+          ${h.redirectTo?`<div class="hop-arrow">→ ${esc(h.redirectTo)}</div>`:''}
+          ${h.type?`<div class="hop-type">${esc(h.type)}</div>`:''}
+        </div></div>`;
     });
     html += `</div>`;
   }
 
-  // "Open directly" button
   html += `<div style="margin-top:1.5rem;text-align:center">
-    <a href="${escapeHtml(finalUrl)}" target="_blank" rel="noopener noreferrer" style="
-      display:inline-block; padding:0.85rem 2rem; background:#2a5a3a; color:#fff;
-      border-radius:8px; text-decoration:none; font-weight:600;
-    ">🚀 Open Final Destination</a>
-  </div>`;
+    <a href="${esc(finalUrl)}" target="_blank" rel="noopener" style="display:inline-block;padding:.85rem 2rem;background:#2a5a3a;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">
+    🚀 Open Final Destination</a></div>`;
 
-  container.innerHTML = html;
+  document.getElementById('results').innerHTML = html;
 }
 
-function copyText(text) {
-  navigator.clipboard.writeText(text).catch(() => {
-    // Fallback
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-  });
-}
-
-function escapeHtml(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-}
-
-// Enter key support
-document.getElementById('urlInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') unshorten();
-});
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')go()});
 </script>
 </body>
 </html>
