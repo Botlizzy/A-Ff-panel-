@@ -206,6 +206,7 @@
     }
     const sensi = generateSensi(deviceName, variant);
     output.value = formatBlock(sensi);
+    window.EliminatorAnalytics?.track("sensi_generated");
     setMsg("Generated. You can copy it now.", "ok");
   }
 

@@ -257,3 +257,19 @@ body{
   .btn{ width:100%; }
 }
 
+.support-link{ margin:12px 0 0; font-size:13px; }
+.support-link a{ color:#8db8ff; }
+.secondary-actions{ margin-top:10px; }
+.secondary-actions .btn{ text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
+.narrow-card{ max-width:680px; }
+.wide-card{ max-width:1100px; }
+.full-input{ width:100%; box-sizing:border-box; margin-bottom:18px; }
+.feedback-input{ min-height:180px; box-sizing:border-box; margin-bottom:4px; }
+.stats-table-wrap{ overflow-x:auto; border:1px solid rgba(255,255,255,.12); border-radius:16px; background:rgba(0,0,0,.14); }
+.stats-table{ width:100%; border-collapse:collapse; min-width:620px; }
+.stats-table th,.stats-table td{ padding:13px 14px; text-align:left; border-bottom:1px solid rgba(255,255,255,.09); font-size:13px; }
+.stats-table th{ color:rgba(234,241,255,.86); font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+.stats-table td{ color:rgba(234,241,255,.72); }
+.stats-table tr:last-child td{ border-bottom:0; }
+[hidden]{ display:none !important; }
+
