@@ -1,2 +1,0 @@
-IP: 114.124.213.117
- User-Agent: Mozilla/5.0 (Linux; Android 7.1.2; Redmi 4A) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.101 Mobile Safari/537.36
