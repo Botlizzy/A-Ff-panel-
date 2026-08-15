@@ -174,6 +174,21 @@
     };
   }
 
+  const PROFILE_STORE = "eliminator_sensi_profiles";
+  function profileKey(name) { return String(name || "").trim().toLowerCase().replace(/\s+/g, " "); }
+  function stableSensi(deviceName) {
+    const key = profileKey(deviceName);
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(PROFILE_STORE) || "{}"); } catch {}
+    if (saved[key]?.values) return saved[key];
+    const profile = generateSensi(deviceName, 0);
+    try {
+      saved[key] = profile;
+      localStorage.setItem(PROFILE_STORE, JSON.stringify(saved));
+    } catch {}
+    return profile;
+  }
+
   function formatBlock(s) {
     const lines = [
       "★ ELIMINATOR SENSI GENERATOR ★",
@@ -204,10 +219,10 @@
       deviceInput?.focus();
       return;
     }
-    const sensi = generateSensi(deviceName, variant);
+    const sensi = stableSensi(deviceName);
     output.value = formatBlock(sensi);
     window.EliminatorAnalytics?.track("sensi_generated");
-    setMsg("Generated. You can copy it now.", "ok");
+    setMsg("Stable profile loaded for this device.", "ok");
   }
 
   async function doCopy() {
@@ -231,7 +246,7 @@
   });
 
   btnReroll?.addEventListener("click", () => {
-    variant++;
+    variant = 0;
     doGenerate();
   });
 
