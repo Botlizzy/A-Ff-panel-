@@ -33,10 +33,9 @@ export default async function handler(request) {
     if (request.method === "GET") {
       const requestedPath = new URL(request.url).searchParams.get("pathname");
       if (requestedPath) {
-        if (!requestedPath.startsWith(PREFIX)) return new Response("Not found", { status: 404 });
         const result = await get(requestedPath, { access: "private", ...blobCredentials });
         if (!result || result.statusCode !== 200) return new Response("Not found", { status: 404 });
-        const filename = requestedPath.slice(PREFIX.length).replace(/^[0-9]+-[a-zA-Z0-9]+-/, "");
+        const filename = (requestedPath.startsWith(PREFIX) ? requestedPath.slice(PREFIX.length) : requestedPath).replace(/^[0-9]+-[a-zA-Z0-9]+-/, "");
         return new Response(result.stream, {
           status: 200,
           headers: {
@@ -48,7 +47,7 @@ export default async function handler(request) {
         });
       }
 
-      const result = await list({ prefix: PREFIX, limit: 1000, ...blobCredentials });
+      const result = await list({ limit: 1000, ...blobCredentials });
       const files = result.blobs.map((blob) => ({
         pathname: blob.pathname.replace(PREFIX, "").replace(/^[0-9]+-[a-zA-Z0-9]+-/, ""),
         url: blob.url,

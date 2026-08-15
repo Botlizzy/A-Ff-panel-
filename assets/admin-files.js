@@ -47,7 +47,7 @@ import { upload } from "https://esm.sh/@vercel/blob@1.1.1/client";
     uploadButton.disabled = true;
     setMessage(`Uploading ${file.name}…`);
     try {
-      await upload(file.name, file, {
+      await upload(`uploaded-hacks/${file.name}`, file, {
         access: "private",
         handleUploadUrl: "/api/upload-token",
       });

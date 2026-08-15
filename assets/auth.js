@@ -10,11 +10,9 @@
     if (type) el.classList.add(type);
   }
 
-  // If already logged in, go to app.
-  if (sessionStorage.getItem(KEY) === "1") {
-    window.location.replace("./app.html");
-    return;
-  }
+  // Always require the access code when the login page is opened.
+  // This prevents an old browser session from silently bypassing the form.
+  sessionStorage.removeItem(KEY);
 
   const form = document.getElementById("login-form");
   const input = document.getElementById("access");
