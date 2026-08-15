@@ -86,7 +86,6 @@ async function handler(request) {
           status: 200,
           headers: {
             "content-type": response.headers.get("content-type") || "application/octet-stream",
-            "content-length": response.headers.get("content-length") || "",
             "content-disposition": `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`,
             "cache-control": "private, no-cache",
             "x-content-type-options": "nosniff"
