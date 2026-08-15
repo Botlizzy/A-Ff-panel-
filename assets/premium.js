@@ -20,7 +20,7 @@
   function escape(value) { return String(value || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
   function formatDate(value) { if (!value) return ""; const date = new Date(value); return Number.isNaN(date.getTime()) ? value : date.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }); }
   function fileName() { return `eliminator-anime-${Date.now()}.png`; }
-  async function downloadBlob() { const response = await fetch(generatedUrl); if (!response.ok) throw new Error("Image download was refused by the image host."); return response.blob(); }
+  async function downloadBlob() { const response = await fetch(`/api/premium-image?download=${encodeURIComponent(generatedUrl)}`); if (!response.ok) throw new Error("Generated image is no longer available."); return response.blob(); }
   async function saveImage() {
     if (!generatedUrl) return setText(imageActionMsg, "Generate an image first.", "error");
     try {

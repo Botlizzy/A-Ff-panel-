@@ -17,4 +17,17 @@ export async function POST(request) {
     } finally { clearTimeout(timer); }
   } catch (error) { return json(error?.name === "AbortError" ? 504 : 502, { error: error?.name === "AbortError" ? "Image generation timed out. Try again." : "Image generation service is temporarily unavailable." }); }
 }
-export async function GET() { return json(405, { error: "Method not allowed" }); }
+export async function GET(request) {
+  const target = new URL(request.url).searchParams.get("download") || "";
+  let remote;
+  try { remote = new URL(target); } catch { return json(400, { error: "Invalid image URL" }); }
+  if (remote.protocol !== "https:" || remote.hostname !== "tmpfiles.org") return json(403, { error: "Image host is not allowed" });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 20000);
+  try {
+    const response = await fetch(remote, { signal: controller.signal });
+    if (!response.ok || !response.body) return json(response.status || 502, { error: "Generated image is no longer available." });
+    return new Response(response.body, { status: 200, headers: { "content-type": response.headers.get("content-type") || "image/png", "content-disposition": "attachment; filename*=UTF-8''eliminator-anime.png", "cache-control": "private, no-cache" } });
+  } catch (error) { return json(error?.name === "AbortError" ? 504 : 502, { error: "Could not download the generated image." }); }
+  finally { clearTimeout(timer); }
+}
