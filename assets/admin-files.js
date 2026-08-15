@@ -1,13 +1,10 @@
-import { upload } from "https://esm.sh/@vercel/blob@1.1.1/client";
 
 (function () {
   const passwordInput = document.getElementById("admin-password");
-  const fileInput = document.getElementById("admin-file");
   const uploadButton = document.getElementById("admin-upload");
   const refreshButton = document.getElementById("admin-refresh");
   const message = document.getElementById("admin-msg");
   const list = document.getElementById("admin-list");
-  const MAX_SIZE = 100 * 1024 * 1024;
 
   function headers() { return { "x-admin-password": passwordInput?.value || "" }; }
   function setMessage(text, type) { message.textContent = text; message.className = `msg ${type || ""}`; }
@@ -38,33 +35,11 @@ import { upload } from "https://esm.sh/@vercel/blob@1.1.1/client";
       setMessage("File deleted.", "ok");
       await loadFiles();
     } catch (error) { setMessage(error.message || "Delete failed.", "error"); }
-  }
-
-  async function uploadFile() {
-    const file = fileInput.files[0];
-    if (!passwordInput?.value) return setMessage("Enter the upload password.", "error");
-    if (!file) return setMessage("Choose a file first.", "error");
-    if (file.size > MAX_SIZE) return setMessage("Files must be 100 MB or smaller.", "error");
-
-    uploadButton.disabled = true;
-    setMessage(`Uploading ${file.name}…`);
-    try {
-      await upload(`uploaded-hacks/${file.name}`, file, {
-        access: "public",
-        handleUploadUrl: "/api/upload-token",
-        clientPayload: JSON.stringify({ password: passwordInput?.value || "" })
-      });
-      fileInput.value = "";
-      setMessage("File uploaded for all users.", "ok");
-      await loadFiles();
-    } catch (error) {
-      setMessage(error.message || "Upload failed. Check the Blob connection and password.", "error");
-    } finally {
-      uploadButton.disabled = false;
-    }
-  }
-
-  uploadButton?.addEventListener("click", uploadFile);
+  }  uploadButton?.addEventListener("click", () => {
+    setMessage("Upload the file from Vercel Blob Storage, then tap Refresh list.", "ok");
+    window.open("https://vercel.com/dashboard", "_blank", "noopener");
+  });
+;
   refreshButton?.addEventListener("click", loadFiles);
   loadFiles();
 })();
