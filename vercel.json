@@ -1,9 +1,20 @@
 {
   "cleanUrls": true,
-  "rewrites": [
-    { "source": "/app", "destination": "/app.html" },
-    { "source": "/upload", "destination": "/upload.html" },
-    { "source": "/admin-upload", "destination": "/admin-upload.html" },
-    { "source": "/", "destination": "/index.html" }
+  "redirects": [
+    { "source": "/", "destination": "/maintenance", "permanent": false },
+    { "source": "/index.html", "destination": "/maintenance", "permanent": false },
+    { "source": "/app", "destination": "/maintenance", "permanent": false },
+    { "source": "/app.html", "destination": "/maintenance", "permanent": false },
+    { "source": "/upload", "destination": "/maintenance", "permanent": false },
+    { "source": "/upload.html", "destination": "/maintenance", "permanent": false },
+    { "source": "/uploaded-hacks", "destination": "/maintenance", "permanent": false },
+    { "source": "/uploaded-hacks.html", "destination": "/maintenance", "permanent": false },
+    { "source": "/admin-upload", "destination": "/maintenance", "permanent": false },
+    { "source": "/admin-upload.html", "destination": "/maintenance", "permanent": false },
+    { "source": "/stats", "destination": "/maintenance", "permanent": false },
+    { "source": "/stats.html", "destination": "/maintenance", "permanent": false },
+    { "source": "/feedback", "destination": "/maintenance", "permanent": false },
+    { "source": "/feedback.html", "destination": "/maintenance", "permanent": false },
+    { "source": "/api/:path*", "destination": "/maintenance", "permanent": false }
   ]
 }
