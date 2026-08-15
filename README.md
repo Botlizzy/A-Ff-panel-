@@ -19,7 +19,7 @@ The local analytics needs no database, but shared file uploads require a Vercel 
 UPLOAD_ADMIN_PASSWORD=Mike
 ```
 
-Vercel Blob supplies the storage token automatically after the store is connected. Redeploy after adding the environment variable. The administrator opens `/admin-uploaded-hacks.html`, enters the password, chooses a file, and uploads it. Files are limited to 4 MB and are listed for logged-in users on `/uploaded-hacks.html`.
+Vercel Blob supplies the storage credentials after the store is connected. The administrator opens `/admin-uploaded-hacks.html`, enters the password, chooses a ZIP, APK, or other file type, and uploads it directly to Blob storage. Files are limited to 100 MB and are listed for logged-in users on `/uploaded-hacks.html`.
 
 The existing static login is a basic client-side gate, not a strong authentication system. The administrator password is checked server-side and must not be committed to GitHub. Only upload files you own or have permission to share; do not use the page to distribute malware, stolen data, or unauthorized material.
 
