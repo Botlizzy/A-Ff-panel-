@@ -36,8 +36,8 @@
       await loadFiles();
     } catch (error) { setMessage(error.message || "Delete failed.", "error"); }
   }  uploadButton?.addEventListener("click", () => {
-    setMessage("Upload the file from Vercel Blob Storage, then tap Refresh list.", "ok");
-    window.open("https://vercel.com/dashboard", "_blank", "noopener");
+    setMessage("Upload the file from Supabase Storage, then tap Refresh list.", "ok");
+    window.open("https://supabase.com/dashboard", "_blank", "noopener");
   });
 ;
   refreshButton?.addEventListener("click", loadFiles);
