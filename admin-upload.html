@@ -7,7 +7,7 @@
     <title>Admin Uploads — ELIMINATOR</title>
     <link rel="stylesheet" href="./assets/styles.css" />
   </head>
-  <body>
+  <body class="landscape-page admin-landscape">
     <canvas id="fx-canvas" aria-hidden="true"></canvas>
     <main class="shell">
       <section class="card glass wide-card">
@@ -16,7 +16,8 @@
           <h1 class="title">Upload files</h1>
           <p class="subtitle">Upload or delete shared files from this page. Enter the upload password to continue.</p>
         </header>
-        <div class="form">
+        <div class="form admin-form-layout">
+          <div class="admin-primary-panel">
           <label class="label" for="admin-password">Upload password</label>
           <input id="admin-password" class="input full-input" type="password" autocomplete="current-password" placeholder="Enter upload password" />
           <p class="hint">Choose a file here and upload it to the shared storage. The password protects uploads and deletions.</p>
@@ -30,6 +31,7 @@
           <p class="hint">ZIP, APK, images, documents, and other file types are accepted up to 100 MB. Do not upload malware, stolen data, or files you do not have permission to share.</p>
           <p id="admin-msg" class="msg" role="status" aria-live="polite"></p>
           <div id="admin-list" class="file-list"></div>
+          </div>
 
           <section class="music-admin-panel">
             <div class="music-panel-heading">

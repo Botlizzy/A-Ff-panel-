@@ -7,7 +7,7 @@
     <title>Daily stats — ELIMINATOR SENSI GENERATOR</title>
     <link rel="stylesheet" href="./assets/styles.css" />
   </head>
-  <body>
+  <body class="landscape-page stats-landscape">
     <canvas id="fx-canvas" aria-hidden="true"></canvas>
     <main class="shell">
       <section class="card glass wide-card">
@@ -19,7 +19,10 @@
         <div class="form">
           <div>
             <p class="hint">These numbers are stored locally in this browser. No database or external connection is required.</p>
-            <p id="stats-msg" class="msg" role="status" aria-live="polite"></p>
+            <div class="stats-status-row">
+              <p id="stats-msg" class="msg" role="status" aria-live="polite"></p>
+              <span id="stats-live" class="live-pill">Live refresh: starting…</span>
+            </div>
           </div>
           <div id="stats-content" hidden>
             <div class="stats-table-wrap">
