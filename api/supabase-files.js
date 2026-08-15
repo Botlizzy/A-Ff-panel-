@@ -118,7 +118,7 @@ async function handler(request) {
       });
       const data = await response.json().catch(() => []);
       if (!response.ok) return json(response.status, { error: data.message || data.error || "Could not list Supabase files" });
-      const files = (Array.isArray(data) ? data : []).filter((item) => item.name && !item.name.startsWith("music/")).map((item) => fileDetails(item, url, bucket));
+      const files = (Array.isArray(data) ? data : []).filter((item) => item.name && item.name !== "music" && !item.name.startsWith("music/")).map((item) => fileDetails(item, url, bucket));
       return json(200, { files, provider: "supabase" });
     }
 

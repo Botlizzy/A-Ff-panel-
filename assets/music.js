@@ -8,13 +8,14 @@
   let audio;
   let playing = false;
   let managedTrack = "";
+  let enabled = localStorage.getItem("eliminator_music_off") !== "1";
   const notes = [220, 277.18, 329.63, 440, 554.37, 659.25];
 
   function updateLabel() {
-    button.setAttribute("aria-pressed", String(playing));
-    button.title = playing ? "Pause background music" : "Start background music";
-    button.querySelector("span").textContent = playing ? "Music on" : "Music off";
-    button.classList.toggle("is-playing", playing);
+    button.setAttribute("aria-pressed", String(enabled));
+    button.title = enabled ? "Turn background music off" : "Turn background music on";
+    button.querySelector("span").textContent = enabled ? "Music on" : "Music off";
+    button.classList.toggle("is-playing", enabled);
   }
   function playNote() {
     if (!playing || !context || !master) return;
@@ -42,12 +43,14 @@
         audio.preload = "auto";
         audio.volume = 0.32;
         audio.addEventListener("error", () => { managedTrack = ""; audio = null; });
+        if (enabled) start().catch(() => {});
       }
     } catch (_) {
       managedTrack = "";
     }
   }
   async function start() {
+    if (!enabled) return;
     if (managedTrack && audio) {
       await audio.play();
       playing = true;
@@ -67,15 +70,28 @@
     updateLabel();
   }
   function pause() {
+    enabled = false;
     playing = false;
+    localStorage.setItem("eliminator_music_off", "1");
     clearInterval(timer);
     if (audio) audio.pause();
     if (context && context.state === "running") context.suspend();
     updateLabel();
   }
+  function enable() {
+    enabled = true;
+    localStorage.removeItem("eliminator_music_off");
+    start().catch(() => updateLabel());
+    updateLabel();
+  }
   button.addEventListener("click", () => {
-    if (playing) pause();
-    else start().catch(() => updateLabel());
+    if (enabled) pause();
+    else enable();
+  });
+  ["pointerdown", "touchstart", "keydown"].forEach((eventName) => {
+    document.addEventListener(eventName, () => {
+      if (enabled && !playing) start().catch(() => {});
+    }, { passive: true });
   });
   updateLabel();
   loadManagedTrack();
