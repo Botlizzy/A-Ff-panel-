@@ -16,41 +16,46 @@ function isAdmin(request) {
 }
 
 export default async function handler(request) {
-  if (request.method === "GET") {
-    const result = await list({ prefix: PREFIX, limit: 1000 });
-    const files = result.blobs.map((blob) => ({
-      pathname: blob.pathname.replace(PREFIX, ""),
-      url: blob.url,
-      size: blob.size,
-      uploadedAt: blob.uploadedAt
-    }));
-    return json(200, { files });
+  try {
+    if (request.method === "GET") {
+      const result = await list({ prefix: PREFIX, limit: 1000 });
+      const files = result.blobs.map((blob) => ({
+        pathname: blob.pathname.replace(PREFIX, ""),
+        url: blob.url,
+        size: blob.size,
+        uploadedAt: blob.uploadedAt
+      }));
+      return json(200, { files });
+    }
+
+    if (!isAdmin(request)) return json(401, { error: "Admin password required" });
+
+    if (request.method === "POST") {
+      const form = await request.formData();
+      const file = form.get("file");
+      if (!(file instanceof File) || !file.name) return json(400, { error: "Choose a file first" });
+      if (file.size > MAX_FILE_SIZE) return json(413, { error: "Files must be 4 MB or smaller" });
+
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 160);
+      const blob = await put(`${PREFIX}${Date.now()}-${safeName}`, file, {
+        access: "public",
+        addRandomSuffix: true,
+        contentType: file.type || "application/octet-stream"
+      });
+      return json(201, { file: { pathname: safeName, url: blob.url, size: blob.size, uploadedAt: new Date().toISOString() } });
+    }
+
+    if (request.method === "DELETE") {
+      const body = await request.json();
+      const url = String(body.url || "");
+      if (!url) return json(400, { error: "Missing file URL" });
+      await del(url);
+      return json(200, { ok: true });
+    }
+
+    return json(405, { error: "Method not allowed" });
+  } catch (error) {
+    console.error("File API error", error);
+    return json(500, { error: "File storage is not connected. Connect Vercel Blob and redeploy." });
   }
-
-  if (!isAdmin(request)) return json(401, { error: "Admin password required" });
-
-  if (request.method === "POST") {
-    const form = await request.formData();
-    const file = form.get("file");
-    if (!(file instanceof File) || !file.name) return json(400, { error: "Choose a file first" });
-    if (file.size > MAX_FILE_SIZE) return json(413, { error: "Files must be 4 MB or smaller" });
-
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 160);
-    const blob = await put(`${PREFIX}${Date.now()}-${safeName}`, file, {
-      access: "public",
-      addRandomSuffix: true,
-      contentType: file.type || "application/octet-stream"
-    });
-    return json(201, { file: { pathname: safeName, url: blob.url, size: blob.size, uploadedAt: new Date().toISOString() } });
-  }
-
-  if (request.method === "DELETE") {
-    const body = await request.json();
-    const url = String(body.url || "");
-    if (!url) return json(400, { error: "Missing file URL" });
-    await del(url);
-    return json(200, { ok: true });
-  }
-
-  return json(405, { error: "Method not allowed" });
 }

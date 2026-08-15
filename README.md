@@ -16,7 +16,7 @@ Static website with a client-side access screen, device-based Sensei generation,
 The local analytics needs no database, but shared file uploads require a Vercel Blob store. In Vercel, connect a Blob store to the project and add this environment variable:
 
 ```text
-UPLOAD_ADMIN_PASSWORD=ELIZZY NOW
+UPLOAD_ADMIN_PASSWORD=Mike
 ```
 
 Vercel Blob supplies the storage token automatically after the store is connected. Redeploy after adding the environment variable. The administrator opens `/admin-uploaded-hacks.html`, enters the password, chooses a file, and uploads it. Files are limited to 4 MB and are listed for logged-in users on `/uploaded-hacks.html`.
