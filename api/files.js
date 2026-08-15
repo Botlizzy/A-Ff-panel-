@@ -12,6 +12,15 @@ if (!process.env.BLOB_STORE_ID && process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID) {
   process.env.BLOB_STORE_ID = process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID;
 }
 
+const blobCredentials = {
+  ...(process.env.BLOB_READ_WRITE_TOKEN || process.env.UPLOAD_ADMIN_PASSWORD_READ_WRITE_TOKEN
+    ? { token: process.env.BLOB_READ_WRITE_TOKEN || process.env.UPLOAD_ADMIN_PASSWORD_READ_WRITE_TOKEN }
+    : {}),
+  ...(process.env.BLOB_STORE_ID || process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID
+    ? { storeId: process.env.BLOB_STORE_ID || process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID }
+    : {})
+};
+
 function json(status, body) {
   return new Response(JSON.stringify(body), {
     status,
@@ -25,7 +34,7 @@ export default async function handler(request) {
       const requestedPath = new URL(request.url).searchParams.get("pathname");
       if (requestedPath) {
         if (!requestedPath.startsWith(PREFIX)) return new Response("Not found", { status: 404 });
-        const result = await get(requestedPath, { access: "private" });
+        const result = await get(requestedPath, { access: "private", ...blobCredentials });
         if (!result || result.statusCode !== 200) return new Response("Not found", { status: 404 });
         const filename = requestedPath.slice(PREFIX.length).replace(/^[0-9]+-[a-zA-Z0-9]+-/, "");
         return new Response(result.stream, {
@@ -39,7 +48,7 @@ export default async function handler(request) {
         });
       }
 
-      const result = await list({ prefix: PREFIX, limit: 1000 });
+      const result = await list({ prefix: PREFIX, limit: 1000, ...blobCredentials });
       const files = result.blobs.map((blob) => ({
         pathname: blob.pathname.replace(PREFIX, "").replace(/^[0-9]+-[a-zA-Z0-9]+-/, ""),
         url: blob.url,
@@ -60,6 +69,7 @@ export default async function handler(request) {
       const blob = await put(`${PREFIX}${Date.now()}-${safeName}`, file, {
         access: "private",
         addRandomSuffix: true,
+        ...blobCredentials,
         contentType: file.type || "application/octet-stream"
       });
       return json(201, { file: { pathname: safeName, url: blob.url, size: blob.size, uploadedAt: new Date().toISOString() } });
@@ -69,7 +79,7 @@ export default async function handler(request) {
       const body = await request.json();
       const url = String(body.url || "");
       if (!url) return json(400, { error: "Missing file URL" });
-      await del(url);
+      await del(url, blobCredentials);
       return json(200, { ok: true });
     }
 
