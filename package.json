@@ -4,6 +4,6 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@netlify/blobs": "^9.1.0"
+    "@upstash/redis": "^1.35.3"
   }
 }
