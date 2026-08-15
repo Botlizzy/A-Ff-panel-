@@ -56,7 +56,7 @@
       const response = await fetch("/api/premium-image", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ prompt }) });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.imageUrl) throw new Error(data.error || "Image generation failed.");
-      generatedUrl = data.imageUrl; generatedPrompt = data.prompt || prompt; image.src = generatedUrl; imagePrompt.textContent = generatedPrompt; result.hidden = false; setText(animeStatus, "Image ready.", "ok"); setText(imageActionMsg, "Choose Save or Download.", "");
+      generatedUrl = data.downloadUrl || data.imageUrl; generatedPrompt = data.prompt || prompt; image.src = data.imageUrl || generatedUrl; imagePrompt.textContent = generatedPrompt; result.hidden = false; setText(animeStatus, "Image ready.", "ok"); setText(imageActionMsg, "Choose Save or Download.", "");
     } catch (error) { setText(animeStatus, error.message || "Image generation failed.", "error"); }
     finally { generateButton.disabled = false; }
   }
