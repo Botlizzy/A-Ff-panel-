@@ -45,6 +45,9 @@ function publicUrl(url, bucket, name) {
 function siteDownloadUrl(name) {
   return `/api/supabase-files?download=${encodeURIComponent(name)}`;
 }
+function siteMusicUrl(name) {
+  return `/api/supabase-files?stream=${encodeURIComponent(name)}`;
+}
 
 async function fetchWithTimeout(resource, options = {}) {
   const controller = new AbortController();
@@ -72,7 +75,23 @@ async function handler(request) {
     const { url, key, bucket } = config();
 
     if (request.method === "GET") {
-      const downloadPath = new URL(request.url).searchParams.get("download");
+      const query = new URL(request.url).searchParams;
+      const streamPath = query.get("stream");
+      if (streamPath !== null) {
+        const pathname = String(streamPath).replace(/^\/+/, "");
+        if (!pathname.startsWith("music/") || pathname.includes("..")) return json(400, { error: "Missing or invalid music path" });
+        const response = await fetchWithTimeout(objectUrl(url, bucket, pathname), { method: "GET", headers: { apikey: key, authorization: `Bearer ${key}` } });
+        if (!response.ok) return json(response.status, { error: "Music file not found" });
+        return new Response(response.body, { status: 200, headers: { "content-type": response.headers.get("content-type") || "audio/mpeg", "cache-control": "public, max-age=300", "accept-ranges": "bytes" } });
+      }
+      if (query.get("music") === "1") {
+        const response = await fetchWithTimeout(`${url}/storage/v1/object/list/${encodeURIComponent(bucket)}`, { method: "POST", headers: headers(key), body: JSON.stringify({ prefix: "music/", limit: 20, offset: 0, sortBy: { column: "created_at", order: "desc" } }) });
+        const data = await response.json().catch(() => []);
+        if (!response.ok) return json(response.status, { error: data.message || data.error || "Could not list music" });
+        const music = (Array.isArray(data) ? data : []).filter((item) => item.name).map((item) => ({ pathname: item.name, url: siteMusicUrl(item.name), contentType: item.metadata?.mimetype || item.metadata?.contentType || "audio/mpeg", size: Number(item.metadata?.size || item.size || 0), uploadedAt: item.created_at || item.updated_at || new Date().toISOString() }));
+        return json(200, { music });
+      }
+      const downloadPath = query.get("download");
       if (downloadPath !== null) {
         const pathname = String(downloadPath).replace(/^\/+/, "");
         if (!pathname || pathname.includes("..")) return json(400, { error: "Missing or invalid file path" });
@@ -99,7 +118,7 @@ async function handler(request) {
       });
       const data = await response.json().catch(() => []);
       if (!response.ok) return json(response.status, { error: data.message || data.error || "Could not list Supabase files" });
-      const files = (Array.isArray(data) ? data : []).filter((item) => item.name).map((item) => fileDetails(item, url, bucket));
+      const files = (Array.isArray(data) ? data : []).filter((item) => item.name && !item.name.startsWith("music/")).map((item) => fileDetails(item, url, bucket));
       return json(200, { files, provider: "supabase" });
     }
 
@@ -108,11 +127,13 @@ async function handler(request) {
     if (request.method === "POST") {
       const form = await request.formData();
       const file = form.get("file");
+      const kind = form.get("kind") === "music" ? "music" : "file";
       if (!(file instanceof File) || !file.name) return json(400, { error: "Choose a file first" });
       if (file.size > MAX_UPLOAD_SIZE) return json(413, { error: "Files must be 100 MB or smaller" });
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 160) || "shared-file";
-      const objectPath = `${Date.now()}-${safeName}`;
-      const response = await fetchWithTimeout(`${url}/storage/v1/object/${encodeURIComponent(bucket)}/${encodeURIComponent(objectPath)}`, {
+      if (kind === "music" && !String(file.type || "").startsWith("audio/") && !/\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(file.name)) return json(415, { error: "Choose an audio file (MP3, WAV, OGG, M4A, AAC, or FLAC)" });
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 160) || (kind === "music" ? "background.mp3" : "shared-file");
+      const objectPath = `${kind === "music" ? "music/" : ""}${Date.now()}-${safeName}`;
+      const response = await fetchWithTimeout(objectUrl(url, bucket, objectPath), {
         method: "POST",
         headers: { ...headers(key, file.type || "application/octet-stream"), "x-upsert": "false" },
         body: file
@@ -122,8 +143,8 @@ async function handler(request) {
       return json(201, {
         file: {
           pathname: objectPath,
-          url: publicUrl(url, bucket, objectPath),
-          downloadUrl: publicUrl(url, bucket, objectPath),
+          url: kind === "music" ? siteMusicUrl(objectPath) : siteDownloadUrl(objectPath),
+          downloadUrl: kind === "music" ? siteMusicUrl(objectPath) : siteDownloadUrl(objectPath),
           size: file.size,
           contentType: file.type || "application/octet-stream",
           uploadedAt: new Date().toISOString()

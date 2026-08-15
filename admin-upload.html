@@ -30,6 +30,25 @@
           <p class="hint">ZIP, APK, images, documents, and other file types are accepted up to 100 MB. Do not upload malware, stolen data, or files you do not have permission to share.</p>
           <p id="admin-msg" class="msg" role="status" aria-live="polite"></p>
           <div id="admin-list" class="file-list"></div>
+
+          <section class="music-admin-panel">
+            <div class="music-panel-heading">
+              <div>
+                <div class="badge">AUDIO</div>
+                <h2 class="section-title">Background music</h2>
+                <p class="hint">Upload an MP3, WAV, OGG, M4A, AAC, or FLAC track. The same admin password protects this section.</p>
+              </div>
+              <span class="music-note">♪ One track can play on the public pages</span>
+            </div>
+            <label class="label" for="admin-music-file">Music file</label>
+            <input id="admin-music-file" class="input full-input" type="file" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac" />
+            <div class="actions">
+              <button id="admin-music-upload" class="btn primary" type="button">Upload background music</button>
+              <button id="admin-music-refresh" class="btn glow" type="button">Refresh music</button>
+            </div>
+            <p id="admin-music-msg" class="msg" role="status" aria-live="polite"></p>
+            <div id="admin-music-list" class="music-list"></div>
+          </section>
         </div>
       </section>
     </main>
