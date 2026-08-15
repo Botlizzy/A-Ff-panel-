@@ -14,7 +14,6 @@
   const form = document.getElementById("login-form");
   const input = document.getElementById("access");
   const msg = document.getElementById("login-msg");
-  const banner = document.getElementById("wrong-code-banner");
   if (!form || !input) return;
 
   form.addEventListener("submit", (event) => {
@@ -22,12 +21,10 @@
     const value = String(input.value || "").trim();
     if (!value) return setMsg(msg, "Please enter the access code.", "error");
     if (value !== ACCESS_CODE) {
-      setMsg(msg, "Incorrect access code.", "error");
-      if (banner) { banner.hidden = false; banner.classList.remove("banner-shake"); void banner.offsetWidth; banner.classList.add("banner-shake"); }
+      setMsg(msg, "Wrong code. Try again.", "error");
       input.select();
       return;
     }
-    if (banner) banner.hidden = true;
     sessionStorage.setItem(KEY, "1");
     setMsg(msg, "Access granted. Redirecting…", "ok");
     setTimeout(() => window.location.replace("./app.html"), 350);
