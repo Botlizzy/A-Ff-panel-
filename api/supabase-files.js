@@ -78,8 +78,9 @@ async function handler(request) {
       const query = new URL(request.url).searchParams;
       const streamPath = query.get("stream");
       if (streamPath !== null) {
-        const pathname = String(streamPath).replace(/^\/+/, "");
-        if (!pathname.startsWith("music/") || pathname.includes("..")) return json(400, { error: "Missing or invalid music path" });
+        let pathname = String(streamPath).replace(/^\/+/, "");
+        if (!pathname.startsWith("music/")) pathname = `music/${pathname}`;
+        if (!pathname || pathname.includes("..")) return json(400, { error: "Missing or invalid music path" });
         const response = await fetchWithTimeout(objectUrl(url, bucket, pathname), { method: "GET", headers: { apikey: key, authorization: `Bearer ${key}` } });
         if (!response.ok) return json(response.status, { error: "Music file not found" });
         return new Response(response.body, { status: 200, headers: { "content-type": response.headers.get("content-type") || "audio/mpeg", "cache-control": "public, max-age=300", "accept-ranges": "bytes" } });
@@ -88,7 +89,7 @@ async function handler(request) {
         const response = await fetchWithTimeout(`${url}/storage/v1/object/list/${encodeURIComponent(bucket)}`, { method: "POST", headers: headers(key), body: JSON.stringify({ prefix: "music/", limit: 20, offset: 0, sortBy: { column: "created_at", order: "desc" } }) });
         const data = await response.json().catch(() => []);
         if (!response.ok) return json(response.status, { error: data.message || data.error || "Could not list music" });
-        const music = (Array.isArray(data) ? data : []).filter((item) => item.name).map((item) => ({ pathname: item.name, url: siteMusicUrl(item.name), contentType: item.metadata?.mimetype || item.metadata?.contentType || "audio/mpeg", size: Number(item.metadata?.size || item.size || 0), uploadedAt: item.created_at || item.updated_at || new Date().toISOString() }));
+        const music = (Array.isArray(data) ? data : []).filter((item) => item.name).map((item) => { const pathname = item.name.startsWith("music/") ? item.name : `music/${item.name}`; return { pathname, url: siteMusicUrl(pathname), contentType: item.metadata?.mimetype || item.metadata?.contentType || "audio/mpeg", size: Number(item.metadata?.size || item.size || 0), uploadedAt: item.created_at || item.updated_at || new Date().toISOString() }; });
         return json(200, { music });
       }
       const downloadPath = query.get("download");
@@ -155,7 +156,8 @@ async function handler(request) {
 
     if (request.method === "DELETE") {
       const body = await request.json().catch(() => ({}));
-      const pathname = String(body.pathname || "").replace(/^\/+/, "");
+      let pathname = String(body.pathname || "").replace(/^\/+/, "");
+      if (body.kind === "music" && pathname && !pathname.startsWith("music/")) pathname = `music/${pathname}`;
       if (!pathname || pathname.includes("..")) return json(400, { error: "Missing or invalid file path" });
       const response = await fetchWithTimeout(`${url}/storage/v1/object/${encodeURIComponent(bucket)}`, {
         method: "DELETE",

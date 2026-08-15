@@ -100,7 +100,7 @@
   async function deleteMusic(pathname) {
     if (!window.confirm("Delete this background track for everyone?")) return;
     try {
-      await readJson(await fetch("/api/supabase-files", { method: "DELETE", headers: { ...headers(), "content-type": "application/json" }, body: JSON.stringify({ pathname }) }));
+      await readJson(await fetch("/api/supabase-files", { method: "DELETE", headers: { ...headers(), "content-type": "application/json" }, body: JSON.stringify({ pathname, kind: "music" }) }));
       setMusicMessage("Background track deleted.", "ok");
       await loadMusic();
     } catch (error) {
