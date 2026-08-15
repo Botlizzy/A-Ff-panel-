@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#070b16" />
+    <title>Premium AI Studio — ELIMINATOR</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+    <link rel="stylesheet" href="./assets/premium.css" />
+  </head>
+  <body class="landscape-page premium-page">
+    <canvas id="fx-canvas" aria-hidden="true"></canvas>
+    <button id="music-toggle" class="music-toggle" type="button" aria-pressed="false" title="Start background music">♫ <span>Music off</span></button>
+    <main class="shell premium-shell">
+      <section class="card glass premium-card">
+        <header class="hero premium-hero">
+          <div>
+            <div class="badge">PREMIUM SERVER</div>
+            <h1 class="title">AI Studio <span>+</span> LiveScore</h1>
+            <p class="subtitle">Generate anime artwork with Animagine and see real match results without exposing external API links.</p>
+          </div>
+          <a class="btn" href="./app.html">Back to Sensi</a>
+        </header>
+        <div class="premium-grid">
+          <section class="studio-panel">
+            <div class="panel-kicker">ANIME IMAGE GENERATOR</div>
+            <h2>Bring your idea to life.</h2>
+            <p class="panel-copy">Describe a character, scene, outfit, lighting, or mood. The premium server handles the generation request.</p>
+            <label class="label" for="anime-prompt">Anime prompt</label>
+            <textarea id="anime-prompt" class="input premium-prompt" maxlength="1000" placeholder="A cyberpunk shrine maiden under neon rain, cinematic lighting, ultra detailed..."></textarea>
+            <div class="premium-actions">
+              <button id="anime-generate" class="btn primary" type="button">Generate anime image</button>
+              <span id="anime-status" class="msg" role="status" aria-live="polite"></span>
+            </div>
+            <div id="image-result" class="image-result" hidden>
+              <div class="image-frame"><img id="generated-image" alt="Generated anime artwork" /></div>
+              <div class="image-meta"><span id="image-prompt"></span><span id="image-provider">Animagine</span></div>
+              <div class="premium-actions image-actions">
+                <button id="save-image" class="btn glow" type="button">Save image</button>
+                <button id="download-image" class="btn primary" type="button">Download image</button>
+              </div>
+              <p id="image-action-msg" class="msg" role="status" aria-live="polite"></p>
+            </div>
+          </section>
+          <section class="scores-panel">
+            <div class="panel-kicker">LIVE SPORTS</div>
+            <div class="scores-heading"><div><h2>LiveScore</h2><p class="panel-copy">Current aggregated match results.</p></div><button id="scores-refresh" class="btn glow" type="button">Refresh</button></div>
+            <div class="scores-status"><span id="scores-status" class="live-pill">Connecting…</span><span id="scores-updated" class="scores-updated"></span></div>
+            <div id="scores-list" class="scores-list"><div class="empty-state">Loading match results…</div></div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <script src="./assets/fx.js"></script>
+    <script src="./assets/music.js"></script>
+    <script src="./assets/premium.js"></script>
+  </body>
+</html>
