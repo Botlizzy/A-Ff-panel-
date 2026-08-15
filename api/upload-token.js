@@ -20,12 +20,7 @@ export default async function handler(request) {
     return await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async (_pathname, clientPayload) => {
-        let payload = {};
-        try { payload = JSON.parse(clientPayload || "{}"); } catch {}
-        if (!process.env.UPLOAD_ADMIN_PASSWORD || payload.password !== process.env.UPLOAD_ADMIN_PASSWORD) {
-          throw new Error("Admin password required");
-        }
+      onBeforeGenerateToken: async () => {
         return {
           allowedContentTypes: undefined,
           maximumSizeInBytes: 100 * 1024 * 1024,

@@ -19,11 +19,6 @@ function json(status, body) {
   });
 }
 
-function isAdmin(request) {
-  return Boolean(process.env.UPLOAD_ADMIN_PASSWORD) &&
-    request.headers.get("x-admin-password") === process.env.UPLOAD_ADMIN_PASSWORD;
-}
-
 export default async function handler(request) {
   try {
     if (request.method === "GET") {
@@ -54,8 +49,6 @@ export default async function handler(request) {
       }));
       return json(200, { files });
     }
-
-    if (!isAdmin(request)) return json(401, { error: "Admin password required" });
 
     if (request.method === "POST") {
       const form = await request.formData();
