@@ -51,7 +51,7 @@ import { upload } from "https://esm.sh/@vercel/blob@1.1.1/client";
     setMessage(`Uploading ${file.name}…`);
     try {
       await upload(file.name, file, {
-        access: "public",
+        access: "private",
         handleUploadUrl: "/api/upload-token",
         clientPayload: JSON.stringify({ password })
       });

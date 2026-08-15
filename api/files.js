@@ -1,6 +1,6 @@
-import { del, list, put } from "@vercel/blob";
+import { del, get, list, put } from "@vercel/blob";
 
-const MAX_FILE_SIZE = 4 * 1024 * 1024;
+const MAX_FILE_SIZE = 100 * 1024 * 1024;
 const PREFIX = "uploaded-hacks/";
 
 function json(status, body) {
@@ -18,10 +18,28 @@ function isAdmin(request) {
 export default async function handler(request) {
   try {
     if (request.method === "GET") {
+      const requestedPath = new URL(request.url).searchParams.get("pathname");
+      if (requestedPath) {
+        if (!requestedPath.startsWith(PREFIX)) return new Response("Not found", { status: 404 });
+        const result = await get(requestedPath, { access: "private" });
+        if (!result || result.statusCode !== 200) return new Response("Not found", { status: 404 });
+        const filename = requestedPath.slice(PREFIX.length).replace(/^[0-9]+-[a-zA-Z0-9]+-/, "");
+        return new Response(result.stream, {
+          status: 200,
+          headers: {
+            "content-type": result.blob.contentType || "application/octet-stream",
+            "content-disposition": `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`,
+            "x-content-type-options": "nosniff",
+            "cache-control": "private, no-cache"
+          }
+        });
+      }
+
       const result = await list({ prefix: PREFIX, limit: 1000 });
       const files = result.blobs.map((blob) => ({
-        pathname: blob.pathname.replace(PREFIX, ""),
+        pathname: blob.pathname.replace(PREFIX, "").replace(/^[0-9]+-[a-zA-Z0-9]+-/, ""),
         url: blob.url,
+        downloadUrl: `/api/files?pathname=${encodeURIComponent(blob.pathname)}`,
         size: blob.size,
         uploadedAt: blob.uploadedAt
       }));
@@ -38,7 +56,7 @@ export default async function handler(request) {
 
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 160);
       const blob = await put(`${PREFIX}${Date.now()}-${safeName}`, file, {
-        access: "public",
+        access: "private",
         addRandomSuffix: true,
         contentType: file.type || "application/octet-stream"
       });
