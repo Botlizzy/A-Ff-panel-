@@ -14,9 +14,11 @@
         <header class="hero">
           <div class="badge">ADMIN</div>
           <h1 class="title">Upload files</h1>
-          <p class="subtitle">Upload or delete shared files from this page. Anyone who knows this URL can manage files.</p>
+          <p class="subtitle">Upload or delete shared files from this page. Enter the upload password to continue.</p>
         </header>
         <div class="form">
+          <label class="label" for="admin-password">Upload password</label>
+          <input id="admin-password" class="input full-input" type="password" autocomplete="current-password" placeholder="Enter upload password" />
           <label class="label" for="admin-file">Choose a file</label>
           <input id="admin-file" class="input full-input" type="file" />
           <div class="actions">

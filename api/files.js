@@ -13,6 +13,10 @@ if (!process.env.BLOB_STORE_ID && process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID) {
 }
 
 const blobToken = process.env.BLOB_READ_WRITE_TOKEN || process.env.UPLOAD_ADMIN_PASSWORD_READ_WRITE_TOKEN;
+
+function isAdmin(request) {
+  return Boolean(process.env.UPLOAD_ADMIN_PASSWORD) && request.headers.get("x-admin-password") === process.env.UPLOAD_ADMIN_PASSWORD;
+}
 const blobStoreId = process.env.BLOB_STORE_ID || process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID;
 const blobCredentials = blobToken ? { token: blobToken } : (blobStoreId ? { storeId: blobStoreId } : {});
 
@@ -28,7 +32,7 @@ export default async function handler(request) {
     if (request.method === "GET") {
       const requestedPath = new URL(request.url).searchParams.get("pathname");
       if (requestedPath) {
-        const result = await get(requestedPath, { access: "private", ...blobCredentials });
+        const result = await get(requestedPath, { access: "public", ...blobCredentials });
         if (!result || result.statusCode !== 200) return new Response("Not found", { status: 404 });
         const filename = (requestedPath.startsWith(PREFIX) ? requestedPath.slice(PREFIX.length) : requestedPath).replace(/^[0-9]+-[a-zA-Z0-9]+-/, "");
         return new Response(result.stream, {
@@ -46,7 +50,7 @@ export default async function handler(request) {
       const files = result.blobs.map((blob) => ({
         pathname: blob.pathname.replace(PREFIX, "").replace(/^[0-9]+-[a-zA-Z0-9]+-/, ""),
         url: blob.url,
-        downloadUrl: `/api/files?pathname=${encodeURIComponent(blob.pathname)}`,
+        downloadUrl: blob.url,
         size: blob.size,
         uploadedAt: blob.uploadedAt,
         contentType: blob.contentType || "application/octet-stream"
@@ -54,15 +58,17 @@ export default async function handler(request) {
       return json(200, { files });
     }
 
+    if (!isAdmin(request)) return json(401, { error: "Admin password required" });
+
     if (request.method === "POST") {
       const form = await request.formData();
       const file = form.get("file");
       if (!(file instanceof File) || !file.name) return json(400, { error: "Choose a file first" });
-      if (file.size > MAX_FILE_SIZE) return json(413, { error: "Files must be 4 MB or smaller" });
+      if (file.size > MAX_FILE_SIZE) return json(413, { error: "Files must be 100 MB or smaller" });
 
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 160);
       const blob = await put(`${PREFIX}${Date.now()}-${safeName}`, file, {
-        access: "private",
+        access: "public",
         addRandomSuffix: true,
         ...blobCredentials,
         contentType: file.type || "application/octet-stream"
@@ -81,6 +87,6 @@ export default async function handler(request) {
     return json(405, { error: "Method not allowed" });
   } catch (error) {
     console.error("File API error", error);
-    return json(500, { error: "The file store could not be reached. In Vercel, connect the Blob store to this project and Production, then redeploy." });
+    return json(500, { error: "The public Blob store could not be reached. Check the Vercel Blob connection and redeploy." });
   }
 }

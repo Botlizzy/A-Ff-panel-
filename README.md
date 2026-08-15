@@ -1,6 +1,6 @@
 # ELIMINATOR SENSI GENERATOR
 
-Static website with a client-side access screen, device-based Sensei generation, local daily analytics, WhatsApp feedback, and shared administrator-uploaded files.
+Static website with a client-side access screen, device-based Sensei generation, local daily analytics, WhatsApp feedback, and shared uploaded files.
 
 ## Features
 
@@ -8,20 +8,28 @@ Static website with a client-side access screen, device-based Sensei generation,
 - Device input with deterministic “Get sensi” and variant generation.
 - Local daily counts for visitors, unique Sensei generators, and total generation actions.
 - Feedback page that opens WhatsApp with a pre-filled message. The recipient number is intentionally kept out of this public repository.
-- **Uploaded Hacks** page at `/uploaded-hacks.html`, visible from the logged-in generator page, where users can download shared files.
-- File management page at `/admin-uploaded-hacks.html` for uploading and deleting files.
+- **Uploaded Hacks** page at `/upload` or `/uploaded-hacks.html`, where users can download shared files.
+- Password-protected upload page at `/admin-upload` or `/admin-upload.html`.
 
 ## Vercel Blob setup
 
-Shared uploads require a Vercel Blob store connected to this Vercel project. In the Vercel dashboard, open the project’s **Storage** section, create or select a Blob store, and connect it to the project’s Production environment. Keep the store credentials managed by Vercel; never copy them into this repository.
+Connect a **Public** Vercel Blob store to this Vercel project and enable it for the Production environment. Public storage is required by the current direct-upload flow. The files’ public URLs are used only for file delivery; the upload and delete operations remain protected by the server-side password.
 
-The Blob store may be private. The application serves private files through its server-side download route rather than exposing the Blob credential or private storage URL to the browser.
+Keep the Blob credentials managed by Vercel. Never copy tokens into this repository, screenshots, or public messages.
 
-## File management access
+## Upload password
 
-Password protection has intentionally been removed from the file-management page at the owner’s request. Anyone who knows or discovers `/admin-uploaded-hacks.html` can upload or delete files. Use an unshared deployment URL or add Vercel Authentication before using this in a public production site.
+Add the administrator password only in Vercel under **Project Settings → Environment Variables**:
 
-ZIP, APK, and other file types are supported up to the configured upload limit. Only upload files you own or have permission to share. Do not use the feature to distribute malware, stolen data, or unauthorized material.
+```text
+Name: UPLOAD_ADMIN_PASSWORD
+Value: your-private-upload-password
+Environment: Production
+```
+
+The real password is intentionally not stored in this README or in GitHub. Redeploy after adding or changing the variable. Open `/admin-upload` to upload or delete files, and open `/upload` to view and download them.
+
+ZIP, APK, and other file types are supported up to 100 MB. Only upload files you own or have permission to share. Do not use the feature to distribute malware, stolen data, or unauthorized material.
 
 ## Local analytics limitation
 
@@ -29,4 +37,4 @@ The stats page reports the last 14 UTC calendar days recorded by that browser. I
 
 ## Security note
 
-The website’s basic login is client-side and should not be treated as strong authentication. The file-management page is also unprotected after password removal. If you need real administrator-only access, enable Vercel Authentication or another server-side authentication layer before sharing the admin page publicly.
+The main website login is client-side and should not be treated as strong authentication. The upload and delete API operations use the server-side `UPLOAD_ADMIN_PASSWORD` environment variable. If the password is exposed, rotate it in Vercel and redeploy.
