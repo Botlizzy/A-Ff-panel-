@@ -1,5 +1,12 @@
 import { handleUpload } from "@vercel/blob/client";
 
+if (!process.env.BLOB_READ_WRITE_TOKEN && process.env.UPLOAD_ADMIN_PASSWORD_READ_WRITE_TOKEN) {
+  process.env.BLOB_READ_WRITE_TOKEN = process.env.UPLOAD_ADMIN_PASSWORD_READ_WRITE_TOKEN;
+}
+if (!process.env.BLOB_STORE_ID && process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID) {
+  process.env.BLOB_STORE_ID = process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID;
+}
+
 export default async function handler(request) {
   if (request.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {

@@ -3,6 +3,15 @@ import { del, get, list, put } from "@vercel/blob";
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
 const PREFIX = "uploaded-hacks/";
 
+// Vercel can prefix Blob variables with the store connection name.
+// Support both the standard names and the prefixed names shown in the dashboard.
+if (!process.env.BLOB_READ_WRITE_TOKEN && process.env.UPLOAD_ADMIN_PASSWORD_READ_WRITE_TOKEN) {
+  process.env.BLOB_READ_WRITE_TOKEN = process.env.UPLOAD_ADMIN_PASSWORD_READ_WRITE_TOKEN;
+}
+if (!process.env.BLOB_STORE_ID && process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID) {
+  process.env.BLOB_STORE_ID = process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID;
+}
+
 function json(status, body) {
   return new Response(JSON.stringify(body), {
     status,
@@ -74,6 +83,6 @@ export default async function handler(request) {
     return json(405, { error: "Method not allowed" });
   } catch (error) {
     console.error("File API error", error);
-    return json(500, { error: "File storage is not connected. Connect Vercel Blob and redeploy." });
+    return json(500, { error: "The file store could not be reached. In Vercel, connect the Blob store to this project and Production, then redeploy." });
   }
 }

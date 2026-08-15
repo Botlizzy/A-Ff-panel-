@@ -17,7 +17,10 @@
   async function loadFiles() {
     message.textContent = "Loading files…";
     try {
-      const response = await fetch("/api/files", { cache: "no-store" });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 12000);
+      const response = await fetch("/api/files", { cache: "no-store", signal: controller.signal });
+      clearTimeout(timeout);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not load files");
       if (!data.files.length) {
@@ -28,7 +31,7 @@
       message.textContent = `${data.files.length} file${data.files.length === 1 ? "" : "s"} available.`;
       message.className = "msg ok";
     } catch (error) {
-      message.textContent = error.message || "Could not load files.";
+      message.textContent = error.name === "AbortError" ? "The file store took too long to respond. Check the Vercel Blob connection and redeploy." : (error.message || "Could not load files.");
       message.className = "msg error";
     }
   }
