@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0f1f" />
+    <title>Uploaded Hacks — ELIMINATOR</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <canvas id="fx-canvas" aria-hidden="true"></canvas>
+    <main class="shell">
+      <section class="card glass wide-card">
+        <header class="hero">
+          <div class="badge">ELIMINATOR</div>
+          <h1 class="title">Uploaded Hacks</h1>
+          <p class="subtitle">Download the files shared by the administrator.</p>
+        </header>
+        <div class="form">
+          <div class="actions file-toolbar">
+            <button id="files-refresh" class="btn primary" type="button">Refresh files</button>
+            <a class="btn" href="./app.html">Back to generator</a>
+          </div>
+          <p id="files-msg" class="msg" role="status" aria-live="polite">Loading files…</p>
+          <div id="files-list" class="file-list"></div>
+        </div>
+      </section>
+    </main>
+    <script src="./assets/fx.js"></script>
+    <script src="./assets/analytics.js"></script>
+    <script src="./assets/files.js"></script>
+  </body>
+</html>
