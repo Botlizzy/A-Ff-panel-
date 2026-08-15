@@ -276,6 +276,8 @@ body{
 .file-list{ display:grid; gap:10px; margin-top:16px; }
 .file-card{ display:flex; gap:14px; align-items:center; justify-content:space-between; padding:14px; border:1px solid rgba(255,255,255,.12); border-radius:16px; background:rgba(0,0,0,.16); }
 .file-card strong{ display:block; overflow-wrap:anywhere; }
+.file-details{ min-width:0; flex:1; }
+.file-preview{ width:72px; height:72px; object-fit:cover; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(0,0,0,.2); }
 .file-card span{ display:block; margin-top:5px; color:rgba(234,241,255,.58); font-size:12px; }
 .file-card .btn{ flex:0 0 auto; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
 @media (max-width: 560px){ .file-card{ align-items:stretch; flex-direction:column; } .file-card .btn{ width:100%; } }

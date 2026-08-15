@@ -26,7 +26,12 @@
       if (!data.files.length) {
         list.innerHTML = '<div class="note"><div class="note-title">No files yet</div><div class="note-text">The administrator has not uploaded any files.</div></div>';
       } else {
-        list.innerHTML = data.files.map((file) => `<article class="file-card"><div><strong>${escapeHtml(file.pathname)}</strong><span>${formatSize(file.size)} · ${new Date(file.uploadedAt).toLocaleString()}</span></div><a class="btn glow" href="${escapeAttr(file.downloadUrl)}" download>Download</a></article>`).join("");
+        list.innerHTML = data.files.map((file) => {
+          const preview = String(file.contentType || "").startsWith("image/")
+            ? `<img class="file-preview" src="${escapeAttr(file.downloadUrl)}" alt="${escapeHtml(file.pathname)}" loading="lazy" />`
+            : "";
+          return `<article class="file-card">${preview}<div class="file-details"><strong>${escapeHtml(file.pathname)}</strong><span>${formatSize(file.size)} · ${new Date(file.uploadedAt).toLocaleString()}</span></div><a class="btn glow" href="${escapeAttr(file.downloadUrl)}" download>Download</a></article>`;
+        }).join("");
       }
       message.textContent = `${data.files.length} file${data.files.length === 1 ? "" : "s"} available.`;
       message.className = "msg ok";

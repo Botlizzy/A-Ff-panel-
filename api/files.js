@@ -12,14 +12,9 @@ if (!process.env.BLOB_STORE_ID && process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID) {
   process.env.BLOB_STORE_ID = process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID;
 }
 
-const blobCredentials = {
-  ...(process.env.BLOB_READ_WRITE_TOKEN || process.env.UPLOAD_ADMIN_PASSWORD_READ_WRITE_TOKEN
-    ? { token: process.env.BLOB_READ_WRITE_TOKEN || process.env.UPLOAD_ADMIN_PASSWORD_READ_WRITE_TOKEN }
-    : {}),
-  ...(process.env.BLOB_STORE_ID || process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID
-    ? { storeId: process.env.BLOB_STORE_ID || process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID }
-    : {})
-};
+const blobToken = process.env.BLOB_READ_WRITE_TOKEN || process.env.UPLOAD_ADMIN_PASSWORD_READ_WRITE_TOKEN;
+const blobStoreId = process.env.BLOB_STORE_ID || process.env.UPLOAD_ADMIN_PASSWORD_STORE_ID;
+const blobCredentials = blobToken ? { token: blobToken } : (blobStoreId ? { storeId: blobStoreId } : {});
 
 function json(status, body) {
   return new Response(JSON.stringify(body), {
@@ -53,7 +48,8 @@ export default async function handler(request) {
         url: blob.url,
         downloadUrl: `/api/files?pathname=${encodeURIComponent(blob.pathname)}`,
         size: blob.size,
-        uploadedAt: blob.uploadedAt
+        uploadedAt: blob.uploadedAt,
+        contentType: blob.contentType || "application/octet-stream"
       }));
       return json(200, { files });
     }
