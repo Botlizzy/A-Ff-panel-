@@ -61,7 +61,7 @@ function fileDetails(item, url, bucket) {
   };
 }
 
-export default async function handler(request) {
+async function handler(request) {
   try {
     const { url, key, bucket } = config();
 
@@ -127,3 +127,7 @@ export default async function handler(request) {
     return json(503, { error: message });
   }
 }
+
+export async function GET(request) { return handler(request); }
+export async function POST(request) { return handler(request); }
+export async function DELETE(request) { return handler(request); }
