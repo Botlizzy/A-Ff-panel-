@@ -36,8 +36,9 @@
       message.textContent = `${data.files.length} file${data.files.length === 1 ? "" : "s"} available.`;
       message.className = "msg ok";
     } catch (error) {
-      message.textContent = error.name === "AbortError" ? "The file store took too long to respond. Check the Vercel Blob connection and redeploy." : (error.message || "Could not load files.");
-      message.className = "msg error";
+      list.innerHTML = '<div class="note"><div class="note-title">No files available yet</div><div class="note-text">Files will appear here after the shared storage is ready. Tap Refresh files to check again.</div></div>';
+      message.textContent = "No files available right now.";
+      message.className = "msg";
     }
   }
 

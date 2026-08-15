@@ -2,7 +2,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/app", "destination": "/app.html" },
-    { "source": "/upload", "destination": "/uploaded-hacks.html" },
+    { "source": "/upload", "destination": "/upload.html" },
     { "source": "/admin-upload", "destination": "/admin-uploaded-hacks.html" },
     { "source": "/", "destination": "/index.html" }
   ]
