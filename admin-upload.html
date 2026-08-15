@@ -19,13 +19,15 @@
         <div class="form">
           <label class="label" for="admin-password">Upload password</label>
           <input id="admin-password" class="input full-input" type="password" autocomplete="current-password" placeholder="Enter upload password" />
-          <p class="hint">Upload files from your connected Supabase Storage bucket. After uploading, return here and tap Refresh list. The password is required only when deleting files from this page.</p>
+          <p class="hint">Choose a file here and upload it to the shared storage. The password protects uploads and deletions.</p>
+          <label class="label" for="admin-file">File to share</label>
+          <input id="admin-file" class="input full-input" type="file" />
           <div class="actions">
-            <button id="admin-upload" class="btn primary" type="button">Open Supabase Storage</button>
+            <button id="admin-upload" class="btn primary" type="button">Upload selected file</button>
             <button id="admin-refresh" class="btn glow" type="button">Refresh list</button>
             <a class="btn" href="./uploaded-hacks.html">Public files page</a>
           </div>
-          <p class="hint">ZIP, APK, and other file types are accepted by Vercel Blob. Do not upload malware, stolen data, or files you do not have permission to share.</p>
+          <p class="hint">ZIP, APK, images, documents, and other file types are accepted up to 100 MB. Do not upload malware, stolen data, or files you do not have permission to share.</p>
           <p id="admin-msg" class="msg" role="status" aria-live="polite"></p>
           <div id="admin-list" class="file-list"></div>
         </div>
