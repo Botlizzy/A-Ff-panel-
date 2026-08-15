@@ -19,7 +19,7 @@
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 12000);
-      const response = await fetch("/api/files", { cache: "no-store", signal: controller.signal });
+      const response = await fetch("/api/supabase-files", { cache: "no-store", signal: controller.signal });
       clearTimeout(timeout);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not load files");

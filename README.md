@@ -11,11 +11,19 @@ Static website with a client-side access screen, device-based Sensei generation,
 - **Uploaded Hacks** page at `/upload` or `/uploaded-hacks.html`, where users can download shared files.
 - Password-protected upload page at `/admin-upload` or `/admin-upload.html`.
 
-## Vercel Blob setup
+## Supabase Storage setup
 
-Connect a **Public** Vercel Blob store to this Vercel project and enable it for the Production environment. Public storage is required by the current direct-upload flow. The files’ public URLs are used only for file delivery; the upload and delete operations remain protected by the server-side password.
+The file list now uses **Supabase Storage** instead of Vercel Blob. Create a Supabase project and a public bucket named `uploaded-hacks`. Upload files from the Supabase Storage dashboard; the website will list them automatically.
 
-Keep the Blob credentials managed by Vercel. Never copy tokens into this repository, screenshots, or public messages.
+Add these environment variables in Vercel Production:
+
+```text
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-server-only-service-role-key
+SUPABASE_BUCKET=uploaded-hacks
+```
+
+The service-role key is server-only. Never place it in browser code, GitHub, screenshots, or public messages.
 
 ## Upload password
 
@@ -27,7 +35,7 @@ Value: your-private-upload-password
 Environment: Production
 ```
 
-The real password is intentionally not stored in this README or in GitHub. Redeploy after adding or changing the variable. Open `/admin-upload` to upload or delete files, and open `/upload` to view and download them.
+The real password is intentionally not stored in this README or in GitHub. Redeploy after adding or changing the variable. Use the admin page to open Supabase Storage and refresh the list or delete files, and open `/upload` to view and download them.
 
 ZIP, APK, and other file types are supported up to 100 MB. Only upload files you own or have permission to share. Do not use the feature to distribute malware, stolen data, or unauthorized material.
 
@@ -37,4 +45,4 @@ The stats page reports the last 14 UTC calendar days recorded by that browser. I
 
 ## Security note
 
-The main website login is client-side and should not be treated as strong authentication. The upload and delete API operations use the server-side `UPLOAD_ADMIN_PASSWORD` environment variable. If the password is exposed, rotate it in Vercel and redeploy.
+The main website login is client-side and should not be treated as strong authentication. The delete API operation uses the server-side `UPLOAD_ADMIN_PASSWORD` environment variable, while file storage is handled by Supabase Storage. If the password is exposed, rotate it in Vercel and redeploy.

@@ -22,16 +22,16 @@
 
   async function loadFiles() {
     try {
-      const data = await readJson(await fetch("/api/files", { cache: "no-store" }));
-      list.innerHTML = data.files.length ? data.files.map((file) => `<article class="file-card"><div><strong>${escape(file.pathname)}</strong><span>${formatSize(file.size)} · ${new Date(file.uploadedAt).toLocaleString()}</span></div><button class="btn danger" data-url="${escape(file.url)}" type="button">Delete</button></article>`).join("") : '<p class="hint">No files uploaded yet.</p>';
-      list.querySelectorAll("[data-url]").forEach((button) => button.addEventListener("click", () => deleteFile(button.dataset.url)));
+      const data = await readJson(await fetch("/api/supabase-files", { cache: "no-store" }));
+      list.innerHTML = data.files.length ? data.files.map((file) => `<article class="file-card"><div><strong>${escape(file.pathname)}</strong><span>${formatSize(file.size)} · ${new Date(file.uploadedAt).toLocaleString()}</span></div><button class="btn danger" data-path="${escape(file.pathname)}" type="button">Delete</button></article>`).join("") : '<p class="hint">No files uploaded yet.</p>';
+      list.querySelectorAll("[data-path]").forEach((button) => button.addEventListener("click", () => deleteFile(button.dataset.path)));
     } catch (error) { setMessage(error.message || "Could not load files.", "error"); }
   }
 
   async function deleteFile(url) {
     if (!window.confirm("Delete this file for everyone?")) return;
     try {
-      await readJson(await fetch("/api/files", { method: "DELETE", headers: { ...headers(), "content-type": "application/json" }, body: JSON.stringify({ url }) }));
+      await readJson(await fetch("/api/supabase-files", { method: "DELETE", headers: { ...headers(), "content-type": "application/json" }, body: JSON.stringify({ pathname: url }) }));
       setMessage("File deleted.", "ok");
       await loadFiles();
     } catch (error) { setMessage(error.message || "Delete failed.", "error"); }
