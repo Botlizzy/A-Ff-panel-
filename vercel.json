@@ -1,8 +1,7 @@
 {
   "cleanUrls": true,
-  "rewrites": [
-    { "source": "/maintenance", "destination": "/maintenance.html" },
-    { "source": "/((?!maintenance(?:\\.html)?$).*)", "destination": "/maintenance.html" }
+  "routes": [
+    { "src": "^/maintenance(?:\\.html)?$", "dest": "/maintenance.html" },
+    { "src": "^/(.*)$", "dest": "/maintenance.html" }
   ]
 }
-
