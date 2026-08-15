@@ -46,7 +46,11 @@ export default async function handler(request) {
         });
       }
 
-      const result = await list({ limit: 1000, ...blobCredentials });
+      const listResult = list({ limit: 1000, ...blobCredentials });
+      const result = await Promise.race([
+        listResult,
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Blob listing timed out")), 8000))
+      ]);
       const files = result.blobs.map((blob) => ({
         pathname: blob.pathname.replace(PREFIX, "").replace(/^[0-9]+-[a-zA-Z0-9]+-/, ""),
         url: blob.url,
@@ -87,6 +91,6 @@ export default async function handler(request) {
     return json(405, { error: "Method not allowed" });
   } catch (error) {
     console.error("File API error", error);
-    return json(500, { error: "The public Blob store could not be reached. Check the Vercel Blob connection and redeploy." });
+    return json(503, { error: "The Blob store is not responding. Connect this store to the Vercel project and Production, then redeploy." });
   }
 }
