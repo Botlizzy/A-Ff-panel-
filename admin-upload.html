@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0a0f1f" />
+    <title>Admin Uploads — ELIMINATOR</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <canvas id="fx-canvas" aria-hidden="true"></canvas>
+    <main class="shell">
+      <section class="card glass wide-card">
+        <header class="hero">
+          <div class="badge">ADMIN</div>
+          <h1 class="title">Upload files</h1>
+          <p class="subtitle">Upload or delete shared files from this page. Anyone who knows this URL can manage files.</p>
+        </header>
+        <div class="form">
+          <label class="label" for="admin-file">Choose a file</label>
+          <input id="admin-file" class="input full-input" type="file" />
+          <div class="actions">
+            <button id="admin-upload" class="btn primary" type="button">Upload file</button>
+            <button id="admin-refresh" class="btn glow" type="button">Refresh list</button>
+            <a class="btn" href="./uploaded-hacks.html">Public files page</a>
+          </div>
+          <p class="hint">ZIP, APK, and other file types are accepted up to 100 MB. Do not upload malware, stolen data, or files you do not have permission to share.</p>
+          <p id="admin-msg" class="msg" role="status" aria-live="polite"></p>
+          <div id="admin-list" class="file-list"></div>
+        </div>
+      </section>
+    </main>
+    <script src="./assets/fx.js"></script>
+    <script type="module" src="./assets/admin-files.js"></script>
+  </body>
+</html>

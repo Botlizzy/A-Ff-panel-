@@ -3,7 +3,7 @@
   "rewrites": [
     { "source": "/app", "destination": "/app.html" },
     { "source": "/upload", "destination": "/upload.html" },
-    { "source": "/admin-upload", "destination": "/admin-uploaded-hacks.html" },
+    { "source": "/admin-upload", "destination": "/admin-upload.html" },
     { "source": "/", "destination": "/index.html" }
   ]
 }
