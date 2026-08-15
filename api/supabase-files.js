@@ -36,8 +36,14 @@ function isAdmin(request) {
   return Boolean(expected) && getHeader(request, "x-admin-password") === expected;
 }
 
+function objectUrl(url, bucket, name) {
+  return `${url}/storage/v1/object/${encodeURIComponent(bucket)}/${name.split("/").map(encodeURIComponent).join("/")}`;
+}
 function publicUrl(url, bucket, name) {
   return `${url}/storage/v1/object/public/${encodeURIComponent(bucket)}/${name.split("/").map(encodeURIComponent).join("/")}`;
+}
+function siteDownloadUrl(name) {
+  return `/api/supabase-files?download=${encodeURIComponent(name)}`;
 }
 
 async function fetchWithTimeout(resource, options = {}) {
@@ -53,8 +59,8 @@ async function fetchWithTimeout(resource, options = {}) {
 function fileDetails(item, url, bucket) {
   return {
     pathname: item.name,
-    url: publicUrl(url, bucket, item.name),
-    downloadUrl: publicUrl(url, bucket, item.name),
+    url: siteDownloadUrl(item.name),
+    downloadUrl: siteDownloadUrl(item.name),
     size: Number(item.metadata?.size || item.size || 0),
     contentType: item.metadata?.mimetype || item.metadata?.contentType || "application/octet-stream",
     uploadedAt: item.created_at || item.updated_at || new Date().toISOString()
@@ -66,6 +72,27 @@ async function handler(request) {
     const { url, key, bucket } = config();
 
     if (request.method === "GET") {
+      const downloadPath = new URL(request.url).searchParams.get("download");
+      if (downloadPath !== null) {
+        const pathname = String(downloadPath).replace(/^\/+/, "");
+        if (!pathname || pathname.includes("..")) return json(400, { error: "Missing or invalid file path" });
+        const response = await fetchWithTimeout(objectUrl(url, bucket, pathname), {
+          method: "GET",
+          headers: { apikey: key, authorization: `Bearer ${key}` }
+        });
+        if (!response.ok) return json(response.status, { error: "File not found" });
+        const filename = pathname.split("/").pop() || "download";
+        return new Response(response.body, {
+          status: 200,
+          headers: {
+            "content-type": response.headers.get("content-type") || "application/octet-stream",
+            "content-length": response.headers.get("content-length") || "",
+            "content-disposition": `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`,
+            "cache-control": "private, no-cache",
+            "x-content-type-options": "nosniff"
+          }
+        });
+      }
       const response = await fetchWithTimeout(`${url}/storage/v1/object/list/${encodeURIComponent(bucket)}`, {
         method: "POST",
         headers: headers(key),
