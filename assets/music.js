@@ -7,7 +7,8 @@
   let timer;
   let audio;
   let playing = false;
-  let managedTrack = "";
+  const bundledTrack = "/assets/audio/background-music.mp3";
+  let managedTrack = bundledTrack;
   let enabled = localStorage.getItem("eliminator_music_off") !== "1";
   const notes = [220, 277.18, 329.63, 440, 554.37, 659.25];
 
@@ -31,23 +32,13 @@
     oscillator.start(now);
     oscillator.stop(now + 1.8);
   }
-  async function loadManagedTrack() {
-    try {
-      const response = await fetch("/api/supabase-files?music=1", { cache: "no-store" });
-      if (!response.ok) return;
-      const data = await response.json();
-      managedTrack = data.music?.[0]?.url || "";
-      if (managedTrack) {
-        audio = new Audio(managedTrack);
-        audio.loop = true;
-        audio.preload = "auto";
-        audio.volume = 0.32;
-        audio.addEventListener("error", () => { managedTrack = ""; audio = null; });
-        if (enabled) start().catch(() => {});
-      }
-    } catch (_) {
-      managedTrack = "";
-    }
+  function loadBundledTrack() {
+    audio = new Audio(bundledTrack);
+    audio.loop = true;
+    audio.preload = "auto";
+    audio.volume = 0.32;
+    audio.addEventListener("error", () => { managedTrack = ""; audio = null; });
+    if (enabled) start().catch(() => {});
   }
   async function start() {
     if (!enabled) return;
@@ -94,5 +85,5 @@
     }, { passive: true });
   });
   updateLabel();
-  loadManagedTrack();
+  loadBundledTrack();
 })();
